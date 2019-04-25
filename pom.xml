@@ -1,0 +1,290 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<parent>
+		<groupId>org.sonatype.oss</groupId>
+		<artifactId>oss-parent</artifactId>
+		<version>7</version>
+	</parent>
+
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.toceansoft</groupId>
+	<artifactId>toceansoft-base</artifactId>
+	<modules>
+		<module>toceansoft-common</module>
+		<module>toceansoft-framework</module>
+		<module>toceansoft-pay</module>
+		<module>toceansoft-social-login</module>
+		<module>toceansoft-oss-client</module>
+		<module>toceansoft-job</module>
+		<module>toceansoft-framework-base</module>
+		<module>toceansoft-codegenerator-service</module>
+		<module>toceansoft-excel-service</module>
+		<module>toceansoft-audio-service</module>
+	</modules>
+	<packaging>pom</packaging>
+	<version>1.0.0.RELEASE</version>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<java.version>1.8</java.version>
+		<!-- springboot.version>1.5.18.RELEASE</springboot.version -->
+		<springboot.version>2.0.6.RELEASE</springboot.version>
+		<springio.version>Cairo-RELEASE</springio.version>
+		<springintegration.version>5.1.2.RELEASE</springintegration.version>
+		<maven.checkstyleplugin.version>2.17</maven.checkstyleplugin.version>
+		<maven.findbugsplugin.version>3.0.5</maven.findbugsplugin.version>
+		<maven.pmd.version>3.9.0</maven.pmd.version>
+		<maven.compiler.version>3.8.0</maven.compiler.version>
+		<maven.deploy.version>3.0.0-M1</maven.deploy.version>
+		<maven.source.version>3.0.1</maven.source.version>
+		<maven.javadoc.version>2.10.3</maven.javadoc.version>
+
+	</properties>
+
+	<licenses>
+		<license>
+			<name>The Apache Software License, Version 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+	<developers>
+		<developer>
+			<name>Narci.Lee</name>
+			<email>narci2010@qq.com</email>
+			<organization>Toceansoft</organization>
+		</developer>
+	</developers>
+
+	<dependencies>
+
+		<!-- https://mvnrepository.com/artifact/org.apache.commons/commons-lang3 -->
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/commons-codec/commons-codec -->
+		<dependency>
+			<groupId>commons-codec</groupId>
+			<artifactId>commons-codec</artifactId>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.apache.commons/commons-text -->
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-text</artifactId>
+			<version>1.6</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/org.projectlombok/lombok -->
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-api -->
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+		</dependency>
+
+
+	</dependencies>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-dependencies</artifactId>
+				<version>${springboot.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+			<dependency>
+				<groupId>io.spring.platform</groupId>
+				<artifactId>platform-bom</artifactId>
+				<version>${springio.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
+
+	<build>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<excludes>
+					<exclude>*.example</exclude>
+				</excludes>
+			</resource>
+		</resources>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>${maven.compiler.version}</version>
+				<configuration>
+					<source>${java.version}</source>
+					<target>${java.version}</target>
+					<encoding>${project.build.sourceEncoding}</encoding>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-deploy-plugin</artifactId>
+				<version>${maven.deploy.version}</version>
+				<configuration>
+					<skip>false</skip>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>${maven.javadoc.version}</version>
+				<executions>
+					<execution>
+						<id>attach-javadocs</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+						<configuration>
+							<additionalparam>-Xdoclint:none</additionalparam>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+				<version>${maven.source.version}</version>
+				<configuration>
+					<attach>true</attach>
+				</configuration>
+				<!-- 进行package命令时就可以将源码同时进行打包 -->
+				<!-- 所以我们需要绑定source插件到我们default生命周期的 package阶段 -->
+				<executions>
+					<execution>
+						<!-- 定义一个阶段，这个阶段是 package -->
+						<phase>package</phase>
+						<goals>
+							<goal>jar-no-fork</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-checkstyle-plugin</artifactId>
+				<version>${maven.checkstyleplugin.version}</version>
+				<executions>
+					<execution>
+						<id>style-validate</id>
+						<phase>validate</phase>
+						<configuration>
+							<sourceDirectories>
+								<sourceDirectory>${project.build.sourceDirectory}</sourceDirectory>
+							</sourceDirectories>
+							<configLocation>styles/checkstyle.xml</configLocation>
+							<suppressionsLocation>styles/suppressions.xml</suppressionsLocation>
+							<encoding>${project.build.sourceEncoding}</encoding>
+							<consoleOutput>true</consoleOutput>
+							<failsOnError>true</failsOnError>
+							<includeTestSourceDirectory>false</includeTestSourceDirectory>
+							<!--Exclude sources -->
+							<!--<excludes>${maven.checkstyleplugin.excludes}</excludes> -->
+							<excludes>**/resources/**/*</excludes>
+						</configuration>
+						<goals>
+							<goal>check</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-pmd-plugin</artifactId>
+				<version>${maven.pmd.version}</version>
+				<configuration>
+					<failOnViolation>true</failOnViolation>
+					<linkXref>true</linkXref>
+					<sourceEncoding>${project.build.sourceEncoding}</sourceEncoding>
+					<minimumTokens>120</minimumTokens>
+					<targetJdk>${java.version}</targetJdk>
+					<printFailingErrors>true</printFailingErrors>
+					<rulesets>
+						<!-- 指定PMD使用的规则 -->
+						<ruleset>styles/pmd_rules.xml</ruleset>
+					</rulesets>
+					<!-- 指定只扫描特定的包或者文件 -->
+					<!-- <includes> <include>**\/package\/**.java</include> <include>**\/otherpackage\/**.java</include> 
+						</includes> -->
+					<excludes>
+						<exclude>${project.basedir}/src/main/resources/**</exclude>
+						<exclude>**/CouchDBParams.java</exclude>
+						<exclude>**/OpenIdClass.java</exclude>
+						<exclude>**/QQUser.java</exclude>
+						<exclude>**/Baidu**.java</exclude>
+					</excludes>
+				</configuration>
+				<executions>
+					<execution>
+						<id>cpd-validate</id>
+						<phase>validate</phase>
+						<goals>
+							<goal>check</goal>
+						</goals>
+						<configuration>
+							<excludeFromFailureFile>styles/exclude-pmd.properties</excludeFromFailureFile>
+						</configuration>
+					</execution>
+					<!-- execution> <goals> <goal>cpd-check</goal> </goals> <configuration> 
+						<excludeFromFailureFile>styles/exclude-cpd.properties</excludeFromFailureFile> 
+						</configuration> </execution -->
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>findbugs-maven-plugin</artifactId>
+				<version>${maven.findbugsplugin.version}</version>
+				<configuration>
+					<effort>Max</effort>
+					<threshold>Low</threshold>
+					<xmlOutput>true</xmlOutput>
+					<findbugsXmlOutputDirectory>${project.build.directory}/findbugs</findbugsXmlOutputDirectory>
+					<!--Exclude sources -->
+					<excludeFilterFile>styles/findbugs-exclude.xml</excludeFilterFile>
+				</configuration>
+				<executions>
+					<execution>
+						<id>analyze-compile</id>
+						<phase>compile</phase>
+						<goals>
+							<goal>check</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+		</plugins>
+	</build>
+	<distributionManagement>
+		<repository>
+			<id>tocean-release</id>
+			<name>toceansoft
+			release repository</name>
+			<url>http://nexus.toceansoft.com/repository/tocean-release-local/</url>
+		</repository>
+		<snapshotRepository>
+			<id>tocean-snapshot</id>
+			<name>toceansoft
+			snapshot repository</name>
+			<url>http://nexus.toceansoft.com/repository/tocean-snapshots-local/</url>
+		</snapshotRepository>
+	</distributionManagement>
+</project>

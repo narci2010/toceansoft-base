@@ -1,0 +1,9 @@
+version: '2'
+services:
+  toceansoft-dev:
+    image: toceansoft-audio-service/image
+    ports:
+      - "8080:80"
+      - "8443:8441"
+    environment:
+      - spring.profiles.active=dev

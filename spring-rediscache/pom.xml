@@ -1,0 +1,107 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.toceansoft</groupId>
+	<artifactId>spring-rediscache</artifactId>
+	<version>1.2.3-RELEASE</version>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<java.version>1.8</java.version>
+		<maven.compiler.version>3.7.0</maven.compiler.version>
+		<maven.javadoc.version>2.10.4</maven.javadoc.version>
+		<maven.deploy.version>2.7</maven.deploy.version>
+		<maven.proguard.version>2.0.14</maven.proguard.version>
+		<framework.version>1.0.0.RELEASE</framework.version>
+	</properties>
+
+	<dependencies>
+
+		<dependency>
+			<groupId>com.toceansoft</groupId>
+			<artifactId>toceansoft-common</artifactId>
+			<version>${framework.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.projectlombok/lombok -->
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<version>1.16.10</version>
+			<scope>provided</scope>
+		</dependency>
+
+
+	</dependencies>
+
+	<distributionManagement>
+		<repository>
+			<id>tocean-release</id>
+			<name>toceansoft release repository</name>
+			<url>http://nexus.toceansoft.com/repository/tocean-release-local/</url>
+		</repository>
+		<snapshotRepository>
+			<id>tocean-snapshot</id>
+			<name>toceansoft snapshot repository</name>
+			<url>http://nexus.toceansoft.com/repository/tocean-snapshots-local/</url>
+		</snapshotRepository>
+	</distributionManagement>
+	<build>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<excludes>
+					<exclude>*.example</exclude>
+				</excludes>
+			</resource>
+		</resources>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>${maven.compiler.version}</version>
+				<configuration>
+					<source>${java.version}</source>
+					<target>${java.version}</target>
+					<encoding>${project.build.sourceEncoding}</encoding>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-deploy-plugin</artifactId>
+				<version>${maven.deploy.version}</version>
+				<configuration>
+					<skip>false</skip>
+				</configuration>
+			</plugin>
+
+
+			<plugin>
+				<groupId>com.github.wvengen</groupId>
+				<artifactId>proguard-maven-plugin</artifactId>
+				<version>${maven.proguard.version}</version>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>proguard</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<obfuscate>true</obfuscate>
+					<proguardInclude>${basedir}/proguard.cfg</proguardInclude>
+					<attach>true</attach>
+					<attachArtifactClassifier>enhance</attachArtifactClassifier>
+					<!-- attach 的作用是在 install 与 deploy 时将生成的 pg 文件也安装与部署 -->
+					<outjar>${project.build.finalName}-enhance</outjar>
+					<libs>
+						<lib>${java.home}/lib/rt.jar</lib>
+					</libs>
+
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
+</project>

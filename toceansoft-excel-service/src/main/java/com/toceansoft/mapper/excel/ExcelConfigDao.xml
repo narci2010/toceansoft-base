@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.toceansoft.common.excel.dao.ExcelConfigDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.toceansoft.common.excel.entity.ExcelConfigEntity" id="excelConfigMap">
+        <result property="excelConfigId" column="excel_config_id"/>
+        <result property="excelConfigKey" column="excel_config_key"/>
+        <result property="excelConfigTablename" column="excel_config_tablename"/>
+    </resultMap>
+
+	<!--<select id="queryObject" resultType="com.toceansoft.common.excel.entity.ExcelConfigEntity">
+		select * from excel_config where excel_config_id = #{value}
+	</select>-->
+  <select id="queryObject" resultType="com.toceansoft.common.excel.entity.ExcelConfigEntity">
+		 SELECT ec.excel_config_id AS excelConfigId,
+            ec.excel_config_key AS excelConfigKey,
+            ec.excel_config_tablename AS excelConfigTablename,
+            ece.excel_config_exclude_column AS  excelConfigExcludeColumn
+    FROM excel_config ec
+    LEFT JOIN  excel_config_exclude  ece
+    ON ec.excel_config_id = ece.excel_config_id
+    where ec.excel_config_id = #{value}
+	</select>
+	<select id="queryList" resultType="com.toceansoft.common.excel.entity.ExcelConfigEntity">
+		select * from excel_config
+        <choose>
+            <when test="sidx != null and sidx.trim() != ''">
+                order by ${sidx} ${order}
+            </when>
+			<otherwise>
+                order by excel_config_id desc
+			</otherwise>
+        </choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+ 	<select id="queryTotal" resultType="int">
+		select count(*) from excel_config 
+	</select>
+	 
+	<insert id="save" parameterType="com.toceansoft.common.excel.entity.ExcelConfigEntity" useGeneratedKeys="true" keyProperty="excelConfigId">
+		insert into excel_config
+		(
+			`excel_config_key`, 
+			`excel_config_tablename`
+		)
+		values
+		(
+			#{excelConfigKey}, 
+			#{excelConfigTablename}
+		)
+	</insert>
+	 
+	<update id="update" parameterType="com.toceansoft.common.excel.entity.ExcelConfigEntity">
+		update excel_config 
+		<set>
+			<if test="excelConfigKey != null">`excel_config_key` = #{excelConfigKey}, </if>
+			<if test="excelConfigTablename != null">`excel_config_tablename` = #{excelConfigTablename}</if>
+		</set>
+		where excel_config_id = #{excelConfigId}
+	</update>
+	
+	<delete id="delete">
+		delete from excel_config where excel_config_id = #{value}
+	</delete>
+	
+	<delete id="deleteBatch">
+		delete from excel_config where excel_config_id in 
+		<foreach item="excelConfigId" collection="array" open="(" separator="," close=")">
+			#{excelConfigId}
+		</foreach>
+	</delete>
+
+	<!--通过查询key 表名一定是唯一的,但是表名可以不唯一 -->
+	<select id="getExcelConfigByKey" parameterType="String" resultType="com.toceansoft.common.excel.entity.ExcelConfigEntity">
+		 SELECT excel_config_id AS excelConfigId,
+            excel_config_key AS excelConfigKey,
+            excel_config_tablename AS excelConfigTablename
+     FROM   excel_config
+     WHERE excel_config_key =#{excelConfigKey}
+	</select>
+
+	<!--通过key查询ExcelConfig的配置信息-->
+	<select id="getExcelConfigAndExcludeByKey"  parameterType="String" resultType="com.toceansoft.common.excel.entity.ExcelConfigEntity">
+    SELECT ec.excel_config_id AS excelConfigId,
+            ec.excel_config_key AS excelConfigKey,
+            ec.excel_config_tablename AS excelConfigTablename,
+            ece.excel_config_exclude_column AS  excelConfigExcludeColumn
+    FROM excel_config ec
+    LEFT JOIN  excel_config_exclude  ece
+    ON ec.excel_config_id = ece.excel_config_id
+    WHERE  ec.excel_config_key =#{excelConfigKey}
+	</select>
+
+	<!--通过表名或者表对应的key 查询ExcelConfig 的配置 -->
+	<select id="getExcelConfigAndExcludeByKeyOrTablename"  parameterType="String" resultType="com.toceansoft.common.excel.entity.ExcelConfigEntity">
+    SELECT ec.excel_config_id AS excelConfigId,
+            ec.excel_config_key AS excelConfigKey,
+            ec.excel_config_tablename AS excelConfigTablename,
+            ece.excel_config_exclude_column AS  excelConfigExcludeColumn,
+		         ece.excel_config_exclude_id  AS  excelConfigExcludeId
+    FROM excel_config ec
+    LEFT JOIN  excel_config_exclude  ece
+    ON ec.excel_config_id = ece.excel_config_id
+    WHERE  1=1
+    <if test="excelConfigKey != null and excelConfigKey != ''">
+      AND  ec.excel_config_key LIKE concat('%',#{excelConfigKey},'%')
+		</if>
+		<if test="excelConfigTablename != null and excelConfigTablename != ''">
+			AND  ec.excel_config_tablename LIKE concat('%',#{excelConfigTablename},'%')
+		</if>
+	</select>
+
+
+</mapper>

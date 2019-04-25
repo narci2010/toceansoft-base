@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.toceansoft.common.dao.EngineDao">
+
+    <sql id="QUERYPARAM">
+        engine_id, engine_name, engine_desc, `status`
+    </sql>
+
+
+    <select id="findEngine" resultType="com.toceansoft.common.model.Engine">
+        select
+        <include refid="QUERYPARAM"/>
+        from `audio_engine` where status = 0
+    </select>
+
+
+    <select id="queryList" resultType="com.toceansoft.common.model.Engine">
+        select
+        <include refid="QUERYPARAM"/>
+        from `audio_engine` where status = 0
+        <choose>
+            <when test="sidx != null and sidx.trim() != ''">
+                order by ${sidx} ${order}
+            </when>
+            <otherwise>
+                order by engine_id desc
+            </otherwise>
+        </choose>
+        <if test="offset != null and limit != null">
+            limit #{offset}, #{limit}
+        </if>
+    </select>
+
+
+    <insert id="saveEngine">
+        insert into `audio_engine`(engine_name, engine_desc) values(#{engine.engineName},#{engine.engineDesc})
+    </insert>
+
+
+    <update id="update">
+        update `audio_engine`
+        SET
+        engine_name = #{engine.engineName},
+        engine_desc = #{engine.engineDesc}
+        where engine_id = #{engine.engineId}
+    </update>
+
+
+    <update id="delete">
+        update `audio_engine` set `status` = 1 where `engine_id` in
+        <foreach item="engineId" collection="array" open="(" separator="," close=")">
+            #{engineId}
+        </foreach>
+    </update>
+
+
+    <select id="getEngineDetail" resultType="com.toceansoft.common.model.Engine">
+        SELECT <include refid="QUERYPARAM"/> FROM `audio_engine` WHERE engine_id = #{engineId}
+    </select>
+
+
+    <select id="queryTotal" resultType="int">
+        select count(1) from `audio_engine` where status = 0
+    </select>
+
+
+</mapper>

@@ -1,0 +1,98 @@
+/*
+ * Copyright 2010-2017 Tocean Group.
+ * 版权：商业代码，未经许可，禁止任何形式拷贝、传播及使用
+ * 文件名：ShiroCache.java
+ * 描述：
+ * 修改人：Arber.Lee
+ * 修改时间：2018年5月9日
+ * 跟踪单号：
+ * 修改单号：
+ * 修改内容：
+ */
+package com.toceansoft.config.redis;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
+
+import org.apache.shiro.cache.Cache;
+import org.apache.shiro.cache.CacheException;
+import org.springframework.data.redis.core.BoundValueOperations;
+import org.springframework.data.redis.core.RedisTemplate;
+
+/**
+ * 
+ * @author Narci.Lee
+ *
+ * @param <K>
+ * @param <V>
+ */
+@SuppressWarnings("unchecked")
+public class ShiroCache<K, V> implements Cache<K, V> {
+
+	private static final String SHIRO_CACHE = "tocean-shiro-cache:";
+	private String cacheKey;
+	private RedisTemplate<K, V> redisTemplate;
+
+	private Long globExpire;
+
+	@SuppressWarnings("rawtypes")
+	public ShiroCache(String name, RedisTemplate client, Long globExpire) {
+		this.cacheKey = SHIRO_CACHE + name + ":";
+		this.redisTemplate = client;
+		this.globExpire = globExpire;
+	}
+
+	@Override
+	public V get(K key) throws CacheException {
+		BoundValueOperations<K, V> bvs = redisTemplate.boundValueOps(getCacheKey(key));
+		// log.debug("bvs:" + bvs + ":" + globExpire);
+		bvs.expire(globExpire, TimeUnit.MILLISECONDS);
+		return redisTemplate.boundValueOps(getCacheKey(key)).get();
+	}
+
+	@Override
+	public V put(K key, V value) throws CacheException {
+		V old = get(key);
+		redisTemplate.boundValueOps(getCacheKey(key)).set(value);
+		return old;
+	}
+
+	@Override
+	public V remove(K key) throws CacheException {
+		V old = get(key);
+		redisTemplate.delete(getCacheKey(key));
+		return old;
+	}
+
+	@Override
+	public void clear() throws CacheException {
+		redisTemplate.delete(keys());
+	}
+
+	@Override
+	public int size() {
+		return keys().size();
+	}
+
+	@Override
+	public Set<K> keys() {
+		return redisTemplate.keys(getCacheKey("*"));
+	}
+
+	@Override
+	public Collection<V> values() {
+		Set<K> set = keys();
+		List<V> list = new ArrayList<>();
+		for (K s : set) {
+			list.add(get(s));
+		}
+		return list;
+	}
+
+	private K getCacheKey(Object k) {
+		return (K) (this.cacheKey + k);
+	}
+}

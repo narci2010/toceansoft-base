@@ -1,0 +1,333 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.toceansoft.common.sociallogin.dao.SysWechatUserDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.toceansoft.common.sociallogin.entity.SysWechatUserEntity" id="sysWechatUserMap">
+        <result property="wechatUserId" column="wechat_user_id"/>
+        <result property="openid" column="openid"/>
+        <result property="nickname" column="nickname"/>
+        <result property="sex" column="sex"/>
+        <result property="province" column="province"/>
+        <result property="city" column="city"/>
+        <result property="country" column="country"/>
+        <result property="language" column="language"/>
+        <result property="headimgurl" column="headimgurl"/>
+        <result property="subscribe" column="subscribe"/>
+        <result property="subscribetime" column="subscribeTime"/>
+        <result property="remark" column="remark"/>
+        <result property="groupid" column="groupid"/>
+        <result property="subscribescene" column="subscribeScene"/>
+        <result property="qrscene" column="qrScene"/>
+        <result property="qrscenestr" column="qrSceneStr"/>
+    </resultMap>
+        <!--动态查询条件-->   
+    	<sql id="Dynamic_Where_Clause">
+		<if test="criteriaList != null">
+			<foreach collection="criteriaList" item="criteria" index="index0">
+				<trim prefix="(" suffix=")">
+					<foreach collection="criteria.criteria" item="criterion"
+						index="index">
+						<choose>
+							<when test="criterion.noValue">
+								${criterion.condition}
+							</when>
+							<when test="criterion.singleValue">
+								${criterion.condition} #{criterion.value}
+							</when>
+							<when test="criterion.betweenValue">
+								${criterion.condition} #{criterion.value} AND
+								#{criterion.secondValue}
+							</when>
+							<when test="criterion.listValue">
+								${criterion.condition}
+								<foreach collection="criterion.value" item="listItem"
+									open="(" close=")" separator=",">
+									#{listItem}
+								</foreach>
+							</when>
+						</choose>
+						<if test="index != criteria.criteria.size-1"> ${criterion.conditionRelationship} </if>
+					</foreach>
+				</trim>
+				<if test="index0 != criteriaList.size-1"> ${criteria.conditionRelationship} </if>
+			</foreach>
+		</if>
+	</sql>
+
+	<sql id="orderBy_case">
+		ORDER BY 
+		<choose>
+			<when test="orderByList !=null">
+				<foreach collection="orderByList" item="orderBy" separator=",">
+					${orderBy.condition} ${orderBy.direction}
+				</foreach>
+			</when>
+			<otherwise>
+				wechat_user_id desc
+			</otherwise>
+		</choose>
+	</sql>
+
+	<select id="queryObject" resultType="com.toceansoft.common.sociallogin.entity.SysWechatUserEntity">
+		select * from sys_wechat_user where wechat_user_id = #{value}
+	</select>
+
+	<select id="queryByOpenid" resultType="com.toceansoft.common.sociallogin.entity.SysWechatUserEntity">
+		select * from sys_wechat_user where openid = #{value}
+	</select>
+    <!--Mybatis 中$与#的区别 -->
+    <!--#是将传入的值当做字符串的形式, 使用#可以很大程度上防止sql注入 -->
+    <!--$是将传入的数据直接显示生成sql语句,但是如果使用在order by 中就需要使用 $ -->
+	<select id="queryList" resultType="com.toceansoft.common.sociallogin.entity.SysWechatUserEntity">
+		select * from sys_wechat_user
+        <choose>
+            <when test="sidx != null and sidx.trim() != ''">
+                order by ${sidx} ${order}
+            </when>
+			<otherwise>
+                order by wechat_user_id desc
+			</otherwise>
+        </choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+	<select id="queryListByConditionUgly" resultType="com.toceansoft.common.sociallogin.entity.SysWechatUserEntity">
+		select * from sys_wechat_user
+		<where>
+    			    	   <if test="wechat_user_id != null">
+		    	`wechat_user_id` = #{wechat_user_id} and 		       </if>
+            	    	   <if test="openid != null">
+		    	`openid` = #{openid} and 		       </if>
+            	    	   <if test="nickname != null">
+		    	`nickname` = #{nickname} and 		       </if>
+            	    	   <if test="sex != null">
+		    	`sex` = #{sex} and 		       </if>
+            	    	   <if test="province != null">
+		    	`province` = #{province} and 		       </if>
+            	    	   <if test="city != null">
+		    	`city` = #{city} and 		       </if>
+            	    	   <if test="country != null">
+		    	`country` = #{country} and 		       </if>
+            	    	   <if test="language != null">
+		    	`language` = #{language} and 		       </if>
+            	    	   <if test="headimgurl != null">
+		    	`headimgurl` = #{headimgurl} and 		       </if>
+            	    	   <if test="subscribe != null">
+		    	`subscribe` = #{subscribe} and 		       </if>
+            	    	   <if test="subscribeTime != null">
+		    	`subscribeTime` = #{subscribeTime} and 		       </if>
+            	    	   <if test="remark != null">
+		    	`remark` = #{remark} and 		       </if>
+            	    	   <if test="groupid != null">
+		    	`groupid` = #{groupid} and 		       </if>
+            	    	   <if test="subscribeScene != null">
+		    	`subscribeScene` = #{subscribeScene} and 		       </if>
+            	    	   <if test="qrScene != null">
+		    	`qrScene` = #{qrScene} and 		       </if>
+            	    	   <if test="qrSceneStr != null">
+		    	`qrSceneStr` = #{qrSceneStr} 		       </if>
+            		</where>
+        <choose>
+            <when test="sidx != null and sidx.trim() != ''">
+                order by ${sidx} ${order}
+            </when>
+			<otherwise>
+                order by wechat_user_id desc
+			</otherwise>
+        </choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	<select id="queryListByCondition" resultType="com.toceansoft.common.sociallogin.entity.SysWechatUserEntity">
+		select 
+		<if test="distinct == true">distinct</if> 
+		* from sys_wechat_user
+		<where>
+			<include refid="Dynamic_Where_Clause" />
+		</where>
+		<include refid="orderBy_case" />
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+ 	<select id="queryTotal" resultType="int">
+		select count(*) from sys_wechat_user 
+	</select>
+	<select id="queryTotalByConditionUgly" resultType="int">
+		select count(*) from sys_wechat_user 
+		<where>
+    			    	   <if test="wechat_user_id != null">
+		    	`wechat_user_id` = #{wechat_user_id} and 		       </if>
+            	    	   <if test="openid != null">
+		    	`openid` = #{openid} and 		       </if>
+            	    	   <if test="nickname != null">
+		    	`nickname` = #{nickname} and 		       </if>
+            	    	   <if test="sex != null">
+		    	`sex` = #{sex} and 		       </if>
+            	    	   <if test="province != null">
+		    	`province` = #{province} and 		       </if>
+            	    	   <if test="city != null">
+		    	`city` = #{city} and 		       </if>
+            	    	   <if test="country != null">
+		    	`country` = #{country} and 		       </if>
+            	    	   <if test="language != null">
+		    	`language` = #{language} and 		       </if>
+            	    	   <if test="headimgurl != null">
+		    	`headimgurl` = #{headimgurl} and 		       </if>
+            	    	   <if test="subscribe != null">
+		    	`subscribe` = #{subscribe} and 		       </if>
+            	    	   <if test="subscribeTime != null">
+		    	`subscribeTime` = #{subscribeTime} and 		       </if>
+            	    	   <if test="remark != null">
+		    	`remark` = #{remark} and 		       </if>
+            	    	   <if test="groupid != null">
+		    	`groupid` = #{groupid} and 		       </if>
+            	    	   <if test="subscribeScene != null">
+		    	`subscribeScene` = #{subscribeScene} and 		       </if>
+            	    	   <if test="qrScene != null">
+		    	`qrScene` = #{qrScene} and 		       </if>
+            	    	   <if test="qrSceneStr != null">
+		    	`qrSceneStr` = #{qrSceneStr} 		       </if>
+            		</where>
+	</select>
+		<select id="queryTotalByCondition" resultType="int">
+		select count(*) from sys_wechat_user 
+		<where>
+			<include refid="Dynamic_Where_Clause" />
+		</where>
+	</select>
+	 
+	<insert id="save" parameterType="com.toceansoft.common.sociallogin.entity.SysWechatUserEntity" useGeneratedKeys="true" keyProperty="wechatUserId">
+		insert into sys_wechat_user
+		(
+			`openid`, 
+			`nickname`, 
+			`sex`, 
+			`province`, 
+			`city`, 
+			`country`, 
+			`language`, 
+			`headimgurl`, 
+			`subscribe`, 
+			`subscribeTime`, 
+			`remark`, 
+			`groupid`, 
+			`subscribeScene`, 
+			`qrScene`, 
+			`qrSceneStr`
+		)
+		values
+		(
+			#{openid}, 
+			#{nickname}, 
+			#{sex}, 
+			#{province}, 
+			#{city}, 
+			#{country}, 
+			#{language}, 
+			#{headimgurl}, 
+			#{subscribe}, 
+			#{subscribetime}, 
+			#{remark}, 
+			#{groupid}, 
+			#{subscribescene}, 
+			#{qrscene}, 
+			#{qrscenestr}
+		)
+	</insert>
+	<insert id="saveBatch" parameterType="java.util.List" useGeneratedKeys="true" keyProperty="wechatUserId">
+		insert into sys_wechat_user
+		(
+			`openid`, 
+			`nickname`, 
+			`sex`, 
+			`province`, 
+			`city`, 
+			`country`, 
+			`language`, 
+			`headimgurl`, 
+			`subscribe`, 
+			`subscribeTime`, 
+			`remark`, 
+			`groupid`, 
+			`subscribeScene`, 
+			`qrScene`, 
+			`qrSceneStr`
+		)
+		values
+        <foreach collection="list" item="item" index="index" separator=",">		
+		(
+			#{item.openid}, 
+			#{item.nickname}, 
+			#{item.sex}, 
+			#{item.province}, 
+			#{item.city}, 
+			#{item.country}, 
+			#{item.language}, 
+			#{item.headimgurl}, 
+			#{item.subscribe}, 
+			#{item.subscribetime}, 
+			#{item.remark}, 
+			#{item.groupid}, 
+			#{item.subscribescene}, 
+			#{item.qrscene}, 
+			#{item.qrscenestr}
+		)
+      </foreach>		
+	</insert>	
+	 
+	<update id="update" parameterType="com.toceansoft.common.sociallogin.entity.SysWechatUserEntity">
+	  <foreach collection="list" item="item" index="index" open="" close="" separator=";">
+		update sys_wechat_user 
+		<set>
+			<if test="openid != null">`openid` = #{item.openid}, </if>
+			<if test="nickname != null">`nickname` = #{item.nickname}, </if>
+			<if test="sex != null">`sex` = #{item.sex}, </if>
+			<if test="province != null">`province` = #{item.province}, </if>
+			<if test="city != null">`city` = #{item.city}, </if>
+			<if test="country != null">`country` = #{item.country}, </if>
+			<if test="language != null">`language` = #{item.language}, </if>
+			<if test="headimgurl != null">`headimgurl` = #{item.headimgurl}, </if>
+			<if test="subscribe != null">`subscribe` = #{item.subscribe}, </if>
+			<if test="subscribetime != null">`subscribeTime` = #{item.subscribetime}, </if>
+			<if test="remark != null">`remark` = #{item.remark}, </if>
+			<if test="groupid != null">`groupid` = #{item.groupid}, </if>
+			<if test="subscribescene != null">`subscribeScene` = #{item.subscribescene}, </if>
+			<if test="qrscene != null">`qrScene` = #{item.qrscene}, </if>
+			<if test="qrscenestr != null">`qrSceneStr` = #{item.qrscenestr}</if>
+		</set>
+		where wechat_user_id = #{item.wechatUserId}
+	  </foreach>  	
+	</update>
+	
+	<!-- 注意，以下SQL语句为MySQL，如果采用其他数据库，可能要改写SQL -->
+	<update id="updateBatch" parameterType="java.util.List">
+		replace into  sys_wechat_user 
+				(
+			`wechat_user_id`, 					`openid`, 					`nickname`, 					`sex`, 					`province`, 					`city`, 					`country`, 					`language`, 					`headimgurl`, 					`subscribe`, 					`subscribeTime`, 					`remark`, 					`groupid`, 					`subscribeScene`, 					`qrScene`, 					`qrSceneStr`				) 
+   		values 
+	 <foreach collection="list" item="item" index="index"
+			separator=","> 
+	    (
+	    	       #{item.wechatUserId}, 	    	       #{item.openid}, 	    	       #{item.nickname}, 	    	       #{item.sex}, 	    	       #{item.province}, 	    	       #{item.city}, 	    	       #{item.country}, 	    	       #{item.language}, 	    	       #{item.headimgurl}, 	    	       #{item.subscribe}, 	    	       #{item.subscribetime}, 	    	       #{item.remark}, 	    	       #{item.groupid}, 	    	       #{item.subscribescene}, 	    	       #{item.qrscene}, 	    	       #{item.qrscenestr}	    	    )
+    </foreach> 
+	</update>	
+	
+	<delete id="delete">
+		delete from sys_wechat_user where wechat_user_id = #{value}
+	</delete>
+	
+	<delete id="deleteBatch">
+		delete from sys_wechat_user where wechat_user_id in 
+		<foreach item="wechatUserId" collection="array" open="(" separator="," close=")">
+			#{wechatUserId}
+		</foreach>
+	</delete>
+
+</mapper>

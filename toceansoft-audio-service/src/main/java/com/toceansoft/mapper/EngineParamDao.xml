@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.toceansoft.common.dao.EngineParamDao">
+
+    <sql id="QUERYPARAM">
+        engine_id, param_key, param_desc, param_value, param_type
+    </sql>
+
+
+    <select id="queryObject" resultType="com.toceansoft.common.model.EngineParam">
+        select <include refid="QUERYPARAM"/>
+        from audio_engine_param where engine_id = #{engineId} and param_key = #{paramKey} and status = 0
+    </select>
+
+
+    <select id="findParam" resultType="com.toceansoft.common.model.EngineParam">
+        select
+        <include refid="QUERYPARAM"/>
+        from `audio_engine_param` where status = 0 and engine_id = #{engineId}
+    </select>
+
+
+    <select id="queryList" resultType="com.toceansoft.common.model.EngineParam">
+        select
+        <include refid="QUERYPARAM"/>
+        from `audio_engine_param` where status = 0 and engine_id = #{engineId}
+        <choose>
+            <when test="map.sidx != null and map.sidx.trim() != ''">
+                order by ${map.sidx} ${map.order}
+            </when>
+            <otherwise>
+                order by engine_id desc
+            </otherwise>
+        </choose>
+        <if test="map.offset != null and map.limit != null">
+            limit #{map.offset}, #{map.limit}
+        </if>
+    </select>
+
+
+    <insert id="saveEnginParam">
+        insert into `audio_engine_param` values(#{param.engineId},#{param.paramKey},#{param.paramValue},
+        #{param.paramType},0,#{param.paramDesc})
+    </insert>
+
+
+    <update id="update">
+        update `audio_engine_param`
+        SET
+        param_key = #{param.paramKey},
+        param_value = #{param.paramValue},
+        param_type = #{param.paramType},
+        param_desc = #{param.paramDesc}
+        where engine_id = #{param.engineId} and param_key = #{key}
+    </update>
+
+
+    <update id="updateParamKey">
+        update `audio_engine_param`
+        SET
+        param_value = #{paramValue}
+        where engine_id = #{engineId} and param_key = #{paramKey}
+    </update>
+
+
+    <update id="deleteParam">
+        update `audio_engine_param` set `status` = 1 where `engine_id` = #{engineId} and param_key in
+        <foreach item="key" collection="array" open="(" separator="," close=")">
+            #{key}
+        </foreach>
+    </update>
+
+
+    <select id="queryTotal" resultType="int">
+        select count(1) from `audio_engine_param` where status = 0 and engine_id = #{engineId}
+    </select>
+
+
+    <select id="queryParamExits" resultType="java.lang.Integer">
+        select count(1) from `audio_engine_param` where param_key = #{paramKey} and engine_id = #{engineId} and status = 0
+    </select>
+
+</mapper>

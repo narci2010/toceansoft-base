@@ -1,0 +1,576 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ruleset name="Favorites" xmlns="http://pmd.sf.net/ruleset/1.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://pmd.sf.net/ruleset/1.0.0 http://pmd.sf.net/ruleset_xml_schema.xsd"
+	xsi:noNamespaceSchemaLocation="http://pmd.sf.net/ruleset_xml_schema.xsd">
+
+	<description>
+		作 者：Narci
+		对应 PMD：V5.2.3
+		规则版本：V1.1（2015-01-13）
+		推荐指数：3、4、5级的规则
+		修改规则：EmptyCatchBlock、EmptyIfStmt、EmptyWhileStmt、EmptyTryBlock、EmptyFinallyBlock、EmptySwitchStatements、EmptySynchronizedBlock、
+		EmptyInitializer、EmptyStatementNotInLoop等规则转移到rulesets/java/empty.xml中
+		UnnecessaryModifier、UselessOperationOnImmutable等规则转移到rulesets/java/unnecessary.xml中
+		增加规则：
+		移除规则：UseUtilityClass
+	</description>
+
+
+	<!--====================Basic Rules begin（共33个）====================== -->
+	<!--不允许出现空的catch块,避免屏蔽异常，不处理或不报告异常。(FindBugs不检查) -->
+	<rule ref="rulesets/java/empty.xml/EmptyCatchBlock">
+		<properties>
+			<property name="allowCommentedBlocks" value="false" />
+		</properties>
+	</rule>
+	<!--不允许有空if语句块（或空else块）。(FindBugs不检查) -->
+	<rule ref="rulesets/java/empty.xml/EmptyIfStmt" />
+	<!--不允许有空while循环块。注意：不包括do循环。(FindBugs不检查) -->
+	<rule ref="rulesets/java/empty.xml/EmptyWhileStmt" />
+	<!--不允许有空try块。(FindBugs不检查) -->
+	<rule ref="rulesets/java/empty.xml/EmptyTryBlock" />
+	<!--不允许有空finally块。(FindBugs不检查) -->
+	<rule ref="rulesets/java/empty.xml/EmptyFinallyBlock" />
+	<!--不允许有空switch块。与这个规则重复：rulesets/java/design.xml/SwitchStmtsShouldHaveDefault、MissingBreakInSwitch。(FindBugs不检查) -->
+	<rule ref="rulesets/java/empty.xml/EmptySwitchStatements" />
+	<!--避免混乱的循环变量赋值（避免在内循环里修改外循环变量）。与这个规则有点重复：rulesets/java/controversial.xml/DataflowAnomalyAnalysis。(FindBugs不检查) -->
+	<rule ref="rulesets/java/basic.xml/JumbledIncrementer" />
+	<!--简单的for循环可以用while循环取代。(FindBugs不检查，注，FindBugs能发现死循环) -->
+	<!--rule ref="rulesets/java/basic.xml/ForLoopShouldBeWhileLoop"/ -->
+	<!--当基本型数据转换成String时，避免不必要的临时对象。(FindBugs检查) -->
+	<!--rule ref="rulesets/java/unnecessary.xml/UnnecessaryConversionTemporary"/ -->
+	<!--equals和hashcode同时定义。(FindBugs检查) -->
+	<rule ref="rulesets/java/basic.xml/OverrideBothEqualsAndHashcode" />
+	<!--doublecheck问题。(FindBugs检查) -->
+	<!--rule ref="rulesets/java/basic.xml/DoubleCheckedLocking"/ -->
+	<!--禁止在finally块里return，避免屏蔽异常。(FindBugs不检查) -->
+	<rule ref="rulesets/java/basic.xml/ReturnFromFinallyBlock" />
+	<!--避免空的同步块。(FindBugs检查) -->
+	<rule ref="rulesets/java/empty.xml/EmptySynchronizedBlock" />
+	<!--方法返回值void，避免不必要的return。(FindBugs不检查) -->
+	<!--rule ref="rulesets/java/unnecessary.xml/UnnecessaryReturn"/ -->
+	<!--空的static初始化。(FindBugs不检查) -->
+	<rule ref="rulesets/java/empty.xml/EmptyInitializer" />
+	<!--if语句的条件始终是true或false。(FindBugs不检查) -->
+	<rule ref="rulesets/java/basic.xml/UnconditionalIfStatement" />
+	<!--出现了空语句（就一个分号），如果在循环里则可以。(FindBugs不检查) -->
+	<rule ref="rulesets/java/empty.xml/EmptyStatementNotInLoop" />
+	<!--避免实例化Boolean对象，而应用常量Boolean.TRUE, Boolean.FALSE。(FindBugs只检查构造方法生成对象的情况，不检查valueOf) -->
+	<rule ref="rulesets/java/basic.xml/BooleanInstantiation" />
+	<!--当一个类定义成final后，它所有的方法自动final。(FindBugs不检查) -->
+	<rule ref="rulesets/java/unnecessary.xml/UnnecessaryModifier" />
+	<!--内嵌的if语句能够和外层的if语句合并成一个if语句。(FindBugs不检查) -->
+	<!--rule ref="rulesets/java/basic.xml/CollapsibleIfStatements"/ -->
+	<!--被覆盖的方法仅仅调用了基类的方法。(FindBugs检查) -->
+	<!--rule ref="rulesets/java/unnecessary.xml/UselessOverridingMethod"/ -->
+	<!--Collection.toArray调用转换成数组，应主动传一个明确类型的数组对象，否则运行时会抛ClassCastException异常。相似规则：rulesets/java/design.xml/OptimizableToArrayCall。(FindBugs不检查) -->
+	<rule ref="rulesets/java/basic.xml/ClassCastExceptionWithToArray" />
+	<!--new BigDecimal建议用String参数的构造方法，而不是十进制小数常量（整数除外）。(FindBugs不检查) -->
+	<rule
+		ref="rulesets/java/basic.xml/AvoidDecimalLiteralsInBigDecimalConstructor" />
+	<!--不可变对象（如BigDecimal、BigInteger）上的操作结果被忽略。(FindBugs检查) -->
+	<rule ref="rulesets/java/unnecessary.xml/UselessOperationOnImmutable" />
+	<!--空指针判断放错了位置。要么之前已报空指针，要么此处永远不可能是空指针。(FindBugs检查) -->
+	<rule ref="rulesets/java/basic.xml/MisplacedNullCheck" />
+	<!--在判断了对象是否是空指针后，后面紧接着调用该对象的equals方法，而不是将对象作为另一个对象的equals参数。(FindBugs不检查) -->
+	<!--rule ref="rulesets/java/unnecessary.xml/UnusedNullCheckInEquals"/ -->
+	<!--不建议用ThreadGroup，因为它的方法不是线程安全的。(FindBugs不检查) -->
+	<!--rule ref="rulesets/java/basic.xml/AvoidThreadGroup"/ -->
+	<!--应该用&&取代||或反之。(FindBugs检查) -->
+	<rule ref="rulesets/java/basic.xml/BrokenNullCheck" />
+	<!--不要再创建已经有的对象（BigDecimal.ZERO, BigDecimal.ONE, BigDecimal.TEN）。(FindBugs不检查) -->
+	<rule ref="rulesets/java/basic.xml/BigIntegerInstantiation" />
+	<!--避免使用八进制值。(FindBugs不检查) -->
+	<!--rule ref="rulesets/java/basic.xml/AvoidUsingOctalValues"/ -->
+	<!--避免硬编码IPv4和IPv6，以免在某些情况下变的不可能布署。(FindBugs不检查) -->
+	<!-- <rule ref="rulesets/java/basic.xml/AvoidUsingHardCodedIP"> <properties> 
+		<property name="pattern" value=""/> </properties> </rule> -->
+	<!--对ResultSet的方法（next,previous,first,last）调用结果要进行是否是真的判断。(FindBugs不检查) -->
+	<rule ref="rulesets/java/basic.xml/CheckResultSet" />
+	<!--避免多个一元操作符，要么是一个错误，要么易引起混淆。(FindBugs不检查) -->
+	<rule ref="rulesets/java/basic.xml/AvoidMultipleUnaryOperators" />
+	<!--====================Basic Rules end====================== -->
+
+
+	<!--====================braces Rules begin（共4个）====================== -->
+	<!--避免使用if语句时不使用大括号 -->
+	<rule ref="rulesets/java/braces.xml/IfStmtsMustUseBraces" />
+	<!--避免使用while循环时不使用大括号 -->
+	<rule ref="rulesets/java/braces.xml/WhileLoopsMustUseBraces" />
+	<!--避免使用if-else语句时不使用大括号 -->
+	<rule ref="rulesets/java/braces.xml/IfElseStmtsMustUseBraces" />
+	<!--避免使用for循环时不使用大括号 -->
+	<rule ref="rulesets/java/braces.xml/ForLoopsMustUseBraces" />
+	<!--====================braces Rules end====================== -->
+
+
+	<!--====================clone Rules begin（共3个）====================== -->
+	<!--适当的克隆实现：对象的clone()方法中应该包含super.clone()实现 -->
+	<rule ref="rulesets/java/clone.xml/ProperCloneImplementation" />
+	<!--克隆方法要抛出不支持克隆异常：clone()方法应该抛出CloneNotSupportedException -->
+	<rule ref="rulesets/java/clone.xml/CloneThrowsCloneNotSupportedException" />
+	<!--克隆方法必须实现Cloneable接口：如果类实现Cloneable接口，clone()方法应该被实现为一个final的方法并且只抛出CloneNotSupportedException的异常 -->
+	<rule ref="rulesets/java/clone.xml/CloneMethodMustImplementCloneable" />
+	<!--====================clone Rules end====================== -->
+
+
+	<!--====================codesize Rules begin（共11个）====================== -->
+	<!--n条路径复杂度：NPath复杂度是一个方法中各种可能的执行路径总和，一般把200作为考虑降低复杂度的临界点 -->
+	<!-- <rule ref="rulesets/java/codesize.xml/NPathComplexity"> <properties> 
+		<property name="minimum" value="200"/> </properties> </rule> -->
+	<!--方法太长：这种违例就是方法中做了太多事，通过创建辅助方法或移除拷贝/粘贴的代码试着减小方法的规模 -->
+	<!-- <rule ref="rulesets/java/codesize.xml/ExcessiveMethodLength"> <properties> 
+		<property name="minimum" value="100"/> </properties> </rule> -->
+	<!--太多的参数：过长的参数列表表明应该创建一个新的对象包装众多的参数值，就是把参数组织到一起 -->
+	<rule ref="rulesets/java/codesize.xml/ExcessiveParameterList">
+		<properties>
+			<property name="minimum" value="7" />
+		</properties>
+	</rule>
+	<!--太长的类：太长的类文件表明类试图做太多的事，试着分解它，减少到易于管理的规模 -->
+	<!-- <rule ref="rulesets/java/codesize.xml/ExcessiveClassLength"> <properties> 
+		<property name="minimum" value="1000"/> </properties> </rule> -->
+	<!--秩复杂性：由if，while，for，case labels等决策点确定的复杂度，1-4是低复杂度，5-7为中，8到10是高复杂度，11以上是非常高 -->
+	<!-- <rule ref="rulesets/java/codesize.xml/CyclomaticComplexity"> <properties> 
+		<property name="reportLevel" value="10"/> property name="showClassesComplexity" 
+		value="true"/> property name="showMethodsComplexity" value="true"/> </properties> 
+		</rule> -->
+	<!--过多的公共成员：一个类中如果声明了大量的公共方法和属性表明类需要分解，因为想完全测试这个类需要大量的努力 -->
+	<!-- <rule ref="rulesets/java/codesize.xml/ExcessivePublicCount"> <properties> 
+		<property name="minimum" value="45"/> </properties> </rule> -->
+	<!--太多的域：类包含太多域可以被重新设计为包含更少的域，可以通过将一些信息组织为嵌套类。比如：一个类包含了city/state/zip域，可以用一个Address域组织这三个域 -->
+	<!-- <rule ref="rulesets/java/codesize.xml/TooManyFields"> <properties> 
+		<property name="maxfields" value="15"/> </properties> </rule> -->
+	<!--NCSS方法代码计算：这个规则采用NCSS(非注释代码块)算法计算给定的方法（不含构造方法）的代码行数。NCSS忽略代码中的注释并且计算实际代码行数。用这种算法，一行单独的代码被计算为1. 
+		（也同时忽略空行） -->
+	<!-- <rule ref="rulesets/java/codesize.xml/NcssMethodCount"> <properties> 
+		<property name="minimum" value="100"/> </properties> </rule> -->
+	<!--NCSS类代码计算：这个规则采用NCSS(非注释代码块)算法计算给定类型的代码行数。NCSS忽略代码中的注释并且计算实际代码行数。用这种算法，一行单独的代码被计算为1.（也同时忽略空行） -->
+	<!-- <rule ref="rulesets/java/codesize.xml/NcssTypeCount"> <properties> 
+		<property name="minimum" value="1500"/> </properties> </rule> -->
+	<!--NCSS构造器代码计算：这个规则适用NCSS（非注释代码块）算法计算给定的构造方法的代码行数。NCSS忽略代码中的注释并且计算实际代码行数。用这种算法，一行单独的代码被计算为1.（也同时忽略空行） -->
+	<!-- <rule ref="rulesets/java/codesize.xml/NcssConstructorCount"> <properties> 
+		<property name="minimum" value="100"/> </properties> </rule> -->
+	<!--太多的方法：类中包含太多方法可能需要重构，以减低复杂度和获取更加细粒度的对象 -->
+	<!-- <rule ref="rulesets/java/codesize.xml/TooManyMethods"> <properties> 
+		<property name="maxmethods" value="20"/> </properties> </rule> -->
+	<!--====================codesize Rules end=============================== -->
+
+
+	<!--==============controversial Rules begin（共19个）==================== -->
+	<!--非必要的构造器：本规则检查不必要的构造器，例如：只存在一个公共的，空方法体的，无参的构造器 -->
+	<rule ref="rulesets/java/controversial.xml/UnnecessaryConstructor" />
+	<!--Null赋值：将null赋值给变量(在声明之外)常常是不好的形式。某些时候这种赋值表示程序员没有想好代码的下一步该做什么。 -->
+	<!--备注：当你需要把变量赋值为null提示垃圾收集器去进行垃圾收集时这是有用的，那么请忽略这个规则 -->
+	<!--rule ref="rulesets/java/controversial.xml/NullAssignment"/ -->
+	<!--只有一个返回：一个方法应该有且只有一处返回点，且应该是方法的最后一条语句。 -->
+	<!--rule ref="rulesets/java/controversial.xml/OnlyOneReturn"/ -->
+	<!--无用的修饰符：在接口中定义的域自动为public static final的，方法自动是public abstract的，接口中嵌套的类或接口自动是public 
+		static的。由于历史原因，上下文暗示的修饰符是被编译器接受的，但是是多余的。 -->
+	<!--rule ref="rulesets/java/controversial.xml/UnusedModifier"/ -->
+	<!--在操作中赋值：避免在操作中赋值；这会使代码复杂并且难以阅读 -->
+	<!--rule ref="rulesets/java/controversial.xml/AssignmentInOperand"/ -->
+	<!--至少有一个构造器：每个类应该至少声明一个构造器 -->
+	<!--rule ref="rulesets/java/controversial.xml/AtLeastOneConstructor"/ -->
+	<!--不要引入Sun包：避免从”sun.*”引入任何类，这些包不是轻便的而且可能更改 -->
+	<rule ref="rulesets/java/controversial.xml/DontImportSun" />
+	<!--令人迷惑的八进制转义序列：在字符串字面量中出现令人迷惑的八进制转义序列 -->
+	<!--rule ref="rulesets/java/controversial.xml/SuspiciousOctalEscape"/ -->
+	<!--在构造器中调用super():在构造器中调用super()方法是很好的做法.如果没有调用super()，但是调用了另外的构造器，那么这个规则不会报告出来 -->
+	<!--rule ref="rulesets/java/controversial.xml/CallSuperInConstructor"/ -->
+	<!--不必要的圆括号：有时候表达式被包在一个不必要的圆括号中，使它们看起来像是一个函数调用 -->
+	<!--rule ref="rulesets/java/unnecessary.xml/UselessParentheses"/ -->
+	<!--默认的包：使用明确的范围代替默认的包私有的级别 -->
+	<!--rule ref="rulesets/java/controversial.xml/DefaultPackage"/ -->
+	<!--布尔转换：使用按位转换来转换布尔值-这是最快的方法 -->
+	<!--rule ref="rulesets/java/controversial.xml/BooleanInversion"/ -->
+	<!--数据流异常分析：数据流分析是跟踪本地的变量定义与否及在数据流中不同路径的变量引用。 -->
+	<!--由此可以发现多种问题：1.UR-异常：指向一个之前没有定义的变量，这是bug且可导致错误2.DU-异常：一个刚刚定义的变量是未定义的。这些异常可能出现在普通的源代码文本中3.DD-异常：一个刚刚定义的变量重新定义。这是不好的但并非一定是个bug。 -->
+	<!--注：这个规则实在有点绕，具体含义我也不是很透彻理解！ -->
+	<!-- <rule ref="rulesets/java/controversial.xml/DataflowAnomalyAnalysis"> 
+		<properties> <property name="maxviolations" value="100"/> <property name="maxpaths" 
+		value="1000"/> </properties> </rule> -->
+	<!--避免Final类型的本地变量：避免使用final类型的本地变量，将它们转为类域 -->
+	<!--rule ref="rulesets/java/controversial.xml/AvoidFinalLocalVariable"/ -->
+	<!--避免使用short类型：Java使用’short’类型来减少内存开销，而不是优化计算。事实上，JVM不具备short类型的算术能力：jvm必须将short类型转化为int类型，然后进行适当的计算再把int类型转回short类型。因此，和内存开销比起来使用’short’类型会对性能有更大的影响 -->
+	<!--rule ref="rulesets/java/controversial.xml/AvoidUsingShortType"/ -->
+	<!--避免使用Volatile：使用关键字’volatile’一般用来调整一个Java应用，因此，需要一个专业的Java内存模型。此外，它的作用范围一定程度上是令人误解的。因此，volatile关键字应该不要被用做维护和移植的目的。 -->
+	<!--rule ref="rulesets/java/controversial.xml/AvoidUsingVolatile"/ -->
+	<!--避免使用本地代码：jvm和Java语言已经提供了很多创建应用程序的帮助，依赖非Java代码应该是非常罕见的。即使如此，事实上必须使用Java本地接口也是罕见的。因为使用JNI使得应用可移植性降低，而且难以维护，所以是不推荐的。 -->
+	<!--rule ref="rulesets/java/controversial.xml/AvoidUsingNativeCode"/ -->
+	<!--避免改变访问控制：getDeclaredConstructors(), getDeclaredConstructor(Class[]) 
+		和 setAccessible(),还有PrivilegedAction接口，允许在运行时改变变量、类和方法的可见性，甚至它们是私有的。显然，这是不应该的，因为这种动作违背了封装原则 -->
+	<rule ref="rulesets/java/controversial.xml/AvoidAccessibilityAlteration" />
+	<!--不要显示的调用垃圾收集器：调用System.gc(), Runtime.getRuntime().gc(), 和 System.runFinalization()是不推荐的。当垃圾收集器使用配置项-Xdisableexplicitgc关闭时，使用代码可以同样进行垃圾收集。此外，现代JVM对于垃圾收集工作做得很棒。当开发一个应用时内存使用的影响无关于内存泄露时，垃圾收集应该交给JVM配置项进行管理而非代码本身。 -->
+	<rule
+		ref="rulesets/java/controversial.xml/DoNotCallGarbageCollectionExplicitly" />
+	<!--=========================controversial Rules end======================== -->
+
+
+	<!--====================coupling Rules begin（共3个）====================== -->
+	<!--对象间的耦合：这个规则统计一个对象中单个的属性、本地变量和返回类型的数目。如果统计数目大于指定的上限值表示耦合度太高。 -->
+	<!-- <rule ref="rulesets/java/coupling.xml/CouplingBetweenObjects"> <properties> 
+		<property name="threshold" value="20"/> </properties> </rule> -->
+	<!--过多的引入：大量的import表明对象有很高的耦合度。本规则统计单一的import数目，如果数目大于用户定义的上限则报告一个违例。 -->
+	<!-- <rule ref="rulesets/java/coupling.xml/ExcessiveImports"> <properties> 
+		<property name="minimum" value="30"/> </properties> </rule> -->
+	<!--松耦合：避免使用具体实现类型(如：HashSet);用接口(如：Set)代替。 -->
+	<rule ref="rulesets/java/coupling.xml/LooseCoupling" />
+	<!--====================coupling Rules end====================== -->
+
+
+	<!--====================Design Rules begin（共48个）====================== -->
+	<!--如果成员方法都是static，建议使用Singletom模式，或定义成abstract类。(FindBugs不检查) -->
+	<!--<rule ref="rulesets/java/design.xml/UseUtilityClass"/> -->
+	<!--避免以下代码 if (bar == x) { return true; } else { return false; }(FindBugs不检查) -->
+	<rule ref="rulesets/java/design.xml/SimplifyBooleanReturns" />
+	<!--避免以下代码 boolean bar = (isFoo() == true);(FindBugs不检查) -->
+	<rule ref="rulesets/java/design.xml/SimplifyBooleanExpressions" />
+	<!--switch语句应该有一个default。(FindBugs不检查) -->
+	<rule ref="rulesets/java/design.xml/SwitchStmtsShouldHaveDefault" />
+	<!--避免较深的if语句，注意：有else的不算。(FindBugs不检查) -->
+	<rule ref="rulesets/java/design.xml/AvoidDeeplyNestedIfStmts">
+		<properties>
+			<property name="problemDepth" value="5" />
+		</properties>
+	</rule>
+	<!--避免方法参数未使用就被赋值。(FindBugs检查) -->
+	<!-- <rule ref="rulesets/java/design.xml/AvoidReassigningParameters"/> -->
+	<!--label下的语句太多，建议优化重构。(FindBugs不检查) -->
+	<!-- <rule ref="rulesets/java/design.xml/SwitchDensity"> <properties> <property 
+		name="minimum" value="10"/> </properties> </rule> -->
+	<!-- 在构造方法中调用了可能会被覆盖的成员方法，后果：可能会有空指针错误。(FindBugs不检查) -->
+	<!--rule ref="rulesets/java/design.xml/ConstructorCallsOverridableMethod"/ -->
+	<!-- 避免以下代码，私有构造方法类在类定义外生成实例，这会导致the generation of an accessor。(FindBugs不检查) 
+		public class Outer { void method(){ Inner ic = new Inner();//Causes generation 
+		of accessor class } public class Inner { private Inner(){} } } -->
+	<rule ref="rulesets/java/design.xml/AccessorClassGeneration" />
+	<!-- final成员变量(field，类字段)建议定义成static，这样可以节省空间 。(FindBugs不检查) -->
+	<rule ref="rulesets/java/design.xml/FinalFieldCouldBeStatic" />
+	<!-- Connection,Statement,ResultSet对象使用后要close。(FindBugs不检查) -->
+	<!--rule ref="rulesets/java/design.xml/CloseResource"/ -->
+	<!-- 不建议使用非静态初始化块 ，易引起混乱。(FindBugs不检查) -->
+	<!--rule ref="rulesets/java/design.xml/NonStaticInitializer"/ -->
+	<!-- switch中的default应放在最后一个。(FindBugs不检查) -->
+	<rule ref="rulesets/java/design.xml/DefaultLabelNotLastInSwitchStmt" />
+	<!-- switch中有非case的label。(FindBugs不检查) -->
+	<rule ref="rulesets/java/design.xml/NonCaseLabelInSwitchStatement" />
+	<!-- Collection.toArray(T[] a)调用中new a数组时要指定数组长度。(FindBugs检查) -->
+	<!--rule ref="rulesets/java/design.xml/OptimizableToArrayCall"/ -->
+	<!-- 避免与Double.NaN进行是否相等比较(==)。(FindBugs检查) -->
+	<rule ref="rulesets/java/design.xml/BadComparison" />
+	<!-- 避免与null比较，如x.equals(null) (FindBugs不检查) -->
+	<rule ref="rulesets/java/design.xml/EqualsNull" />
+	<!-- 避免if(x!=y),要先if(x==y) (FindBugs不检查) -->
+	<!-- <rule ref="rulesets/java/design.xml/ConfusingTernary"/> -->
+	<!-- 为了获得Class对象，请用类的class成员，而不要实例化对象然后getClass (FindBugs检查) -->
+	<rule ref="rulesets/java/design.xml/InstantiationToGetClass" />
+	<!-- 避免幂等操作，如变量赋值给它自己 (FindBugs检查) -->
+	<!--rule ref="rulesets/java/design.xml/IdempotentOperations"/ -->
+	<!-- 生成SimpleDateFormat实例的时候要求指定Locale(FindBugs不检查) -->
+	<!--rule ref="rulesets/java/design.xml/SimpleDateFormatNeedsLocale"/ -->
+	<!-- field在变量定义时或构造方法中赋值后就再也没有改变过，则可以定义成final的。(FindBugs不检查) -->
+	<!--rule ref="rulesets/java/design.xml/ImmutableField"/ -->
+	<!-- 在进行大小字转换(String.toLowerCase()/toUpperCase() )的时候请使用Locale，可以避免某些Locale带来的问题(FindBugs检查) -->
+	<!--rule ref="rulesets/java/design.xml/UseLocaleWithCaseConversions"/ -->
+	<!-- final类不要出现protected字段(FindBugs检查) -->
+	<!--rule ref="rulesets/java/design.xml/AvoidProtectedFieldInFinalClass"/ -->
+	<!-- 赋值给静态非final变量，可能会不安全。在静态区赋值或定义时赋值则没问题。(FindBugs检查) -->
+	<!--rule ref="rulesets/java/design.xml/AssignmentToNonFinalStatic"/ -->
+	<!-- 在不能实例化的类里（定义了私有构造方法的类）没有静态方法，这样这个类不可用。(FindBugs不检查) -->
+	<rule
+		ref="rulesets/java/design.xml/MissingStaticMethodInNonInstantiatableClass" />
+	<!-- 用块级别的同步代替方法级的同步，这样能够保证让真正需要的代码同步(FindBugs不检查) -->
+	<!--rule ref="rulesets/java/design.xml/AvoidSynchronizedAtMethodLevel"/ -->
+	<!-- case没有break(FindBugs检查) -->
+	<!--rule ref="rulesets/java/design.xml/MissingBreakInSwitch"/ -->
+	<!-- 用notifyAll取代notify(FindBugs检查) -->
+	<rule ref="rulesets/java/design.xml/UseNotifyAllInsteadOfNotify" />
+	<!-- 避免在catch子句里再判断具体的异常类型，就是用instanceof。(FindBugs不检查) -->
+	<rule ref="rulesets/java/design.xml/AvoidInstanceofChecksInCatchClause" />
+	<!-- 抽象类没有定义任何抽象方法，如果类仅希望作为基类使用，但又不需要抽象方法，则建议提供一个protected构造方法。(FindBugs不检查) -->
+	<!--rule ref="rulesets/java/design.xml/AbstractClassWithoutAbstractMethod"/ -->
+	<!-- 条件表达式中没有必要在instanceof之前进行空指针判断。(FindBugs不检查) -->
+	<!--rule ref="rulesets/java/design.xml/SimplifyConditional"/ -->
+	<!-- 建议用equals对象，而不是用==.(FindBugs检查) -->
+	<!--rule ref="rulesets/java/design.xml/CompareObjectsWithEquals"/ -->
+	<!-- 字符串变量与常量比较时，先写常量，这样可以避免空指针异常。(FindBugs不检查) -->
+	<!--rule ref="rulesets/java/design.xml/PositionLiteralsFirstInComparisons"/ -->
+	<!-- 避免不必要的本地变量。(FindBugs不检查) -->
+	<!--rule ref="rulesets/java/design.xml/UnnecessaryLocalBeforeReturn"/ -->
+	<!-- 线程不安全的Singleton。(FindBugs不检查) -->
+	<!-- <rule ref="rulesets/java/design.xml/NonThreadSafeSingleton"> <properties> 
+		<property name="checkNonStaticMethods" value="true"/> <property name="checkNonStaticFields" 
+		value="true"/> </properties> </rule> -->
+	<!-- 未加注释的空方法，在方法的花括弧之间未加注释。(FindBugs不检查) -->
+	<!--rule ref="rulesets/java/design.xml/UncommentedEmptyMethodBody"/ -->
+	<!-- 未加注释的空构造方法，在方法的花括弧之间未加注释。注意，在super或this前的注释不算。(FindBugs不检查) -->
+	<!-- <rule ref="rulesets/java/design.xml/UncommentedEmptyConstructor"> <properties> 
+		<property name="ignoreExplicitConstructorInvocation" value="true"/> </properties> 
+		</rule> -->
+	<!-- 避免只有常量的接口定义,可以考虑将其转换成类。(FindBugs不检查) -->
+	<!--rule ref="rulesets/java/design.xml/ConstantsInInterface"/ -->
+	<!-- 静态SimpleDateFormat成员变量访问未加同步。(FindBugs检查，另外FindBugs不建议定义静态SimpleDateFormat成员变量) -->
+	<!--rule ref="rulesets/java/design.xml/UnsynchronizedStaticDateFormatter"/ -->
+	<!-- catch到了异常后又重新throw新的异常，未保留源异常，源异常的stack trace可能会丢失，不利于程序调试。(FindBugs不检查) -->
+	<rule ref="rulesets/java/design.xml/PreserveStackTrace" />
+	<!-- 对Collection对象，建议用isEmpty()取代size()与0的判断。(FindBugs不检查) -->
+	<rule ref="rulesets/java/design.xml/UseCollectionIsEmpty" />
+	<!-- 只有私有构造方法的类应该申明为final的，除非构造方法被内部类调用。注，私有构造方法的类能够被它的内部类使用。(FindBugs不检查) -->
+	<rule
+		ref="rulesets/java/design.xml/ClassWithOnlyPrivateConstructorsShouldBeFinal" />
+	<!-- 抽象类里的空方法应该定义成abstract。(FindBugs不检查) -->
+	<!-- <rule ref="rulesets/java/design.xml/EmptyMethodInAbstractClassShouldBeAbstract"/> -->
+	<!-- 某个类字段仅在一个方法中使用，建议改用本地变量。构造方法中有赋值不算，但定义时有初始值算。(FindBugs不检查) -->
+	<!-- <rule ref="rulesets/java/design.xml/SingularField"> <properties> <property 
+		name="CheckInnerClasses" value="true"/> <property name="DisallowNotAssignment" 
+		value="true"/> </properties> </rule> -->
+	<!-- 返回空数组，而不是null。(FindBugs检查) -->
+	<rule ref="rulesets/java/design.xml/ReturnEmptyArrayRatherThanNull" />
+	<!-- 如果一个抽象类不包含任何方法，只有数据字段，则建议定义private或protected的构造方法以不允许实例化。(FindBugs不检查) -->
+	<!--rule ref="rulesets/java/design.xml/AbstractClassWithoutAnyMethod"/ -->
+	<!-- switch的case语句如果太少的话建议用if取代，以增加代码可读性。(FindBugs不检查) -->
+	<rule ref="rulesets/java/design.xml/TooFewBranchesForASwitchStatement" />
+	<!-- <properties> <property name="minimumNumberCaseForASwitch" value="3"/> 
+		</properties> -->
+	<!--====================Design Rules end====================== -->
+
+
+	<!--====================finalizers Rules begin（共6个）====================== -->
+	<!--空的finalize():如果finalize()方法是空的，那么它就不需要存在。 -->
+	<rule ref="rulesets/java/finalizers.xml/EmptyFinalizer" />
+	<!--finalize方法调用父类finalize：如果finalize()被实现，它应该除了调用super.finalize()之外还应该做点别的。 -->
+	<rule ref="rulesets/java/finalizers.xml/FinalizeOnlyCallsSuperFinalize" />
+	<!--finalize重载：方法名是finalize()的方法应该具有参数。因为不带参数容易令人迷惑且可能是一个bug，那样就不会被JVM调用。 -->
+	<rule ref="rulesets/java/finalizers.xml/FinalizeOverloaded" />
+	<!--finalize没有调用父类的finalize:如果finalize()方法被重新实现，它最后一个动作应该是调用super.finalize(); -->
+	<rule ref="rulesets/java/finalizers.xml/FinalizeDoesNotCallSuperFinalize" />
+	<!--finalize应该是受保护的：如果你覆盖finalize()，使他是protected的，如果作为public的，其它类就可以调用了。 -->
+	<!--rule ref="rulesets/java/finalizers.xml/FinalizeShouldBeProtected"/ -->
+	<!--避免调用finalize:Object.finalize()是由垃圾收集器发现没有引用指向这个对象的时候调用的，应尽量避免人为调用 -->
+	<rule ref="rulesets/java/finalizers.xml/AvoidCallingFinalize" />
+	<!--==========================finalizers Rules end========================== -->
+
+
+	<!--====================imports Rules begin（共5个）======================== -->
+	<!--重复的引入：避免重复的import -->
+	<rule ref="rulesets/java/imports.xml/DuplicateImports" />
+	<!--不要引入java.lang:避免从’java.lang’包引入任何东西，它里面的类是自动引入的 -->
+	<rule ref="rulesets/java/imports.xml/DontImportJavaLang" />
+	<!--未使用的imports:去掉不使用的import -->
+	<rule ref="rulesets/java/imports.xml/UnusedImports" />
+	<!--从同一个包引入：不需要从同一包引入类型 -->
+	<rule ref="rulesets/java/imports.xml/ImportFromSamePackage" />
+	<!--太多的静态引入：如果滥用静态引入特性，会使你的程序不具有可读性和可维护性，你引入的太多的静态成员污染 -->
+	<!-- <rule ref="rulesets/java/imports.xml/TooManyStaticImports"> <properties> 
+		<property name="maximumStaticImports" value="4"/> </properties> </rule> -->
+	<!--=======================imports Rules end=========================== -->
+
+
+	<!--====================j2ee Rules begin（共9个）====================== -->
+	<!--使用合适的类加载器：在J2EE中getClassLoader()方法可能不会按照期望工作。使用Thread.currentThread().getContextClassLoader()来代替。 -->
+	<!--rule ref="rulesets/java/j2ee.xml/UseProperClassLoader"/ -->
+	<!--消息驱动bean和会话bean命名规则：EJB规范表示任何消息驱动bean和会话bean的命名应该以’Bean’结尾。 代码示例： /* 
+		Proper name */ public class SomeBean implements SessionBean{} /* Bad name 
+		*/ public class MissingTheProperSuffix implements SessionBean {} -->
+	<!--rule ref="rulesets/java/j2ee.xml/MDBAndSessionBeanNamingConvention"/ -->
+	<!--远程会话接口命名规则：会话EJB的remote home接口命名应该以‘Home’结尾。 代码示例： /* Proper name */ 
+		public interface MyBeautifulHome extends javax.ejb.EJBHome {} /* Bad name 
+		*/ public interface MissingProperSuffix extends javax.ejb.EJBHome {} -->
+	<!--rule ref="rulesets/java/j2ee.xml/RemoteSessionInterfaceNamingConvention"/ -->
+	<!--本地接口会话命名规则：会话EJB的本地接口应该以‘Local’结尾。 代码示例： /* Proper name */ public interface 
+		MyLocal extends javax.ejb.EJBLocalObject {} /* Bad name */ public interface 
+		MissingProperSuffix extends javax.ejb.EJBLocalObject {} -->
+	<!--rule ref="rulesets/java/j2ee.xml/LocalInterfaceSessionNamingConvention"/ -->
+	<!--本地Home命名规则：会话EJB的本地home接口应该以’LocalHome’结尾 代码示例： /* Proper name */ public 
+		interface MyBeautifulLocalHome extends javax.ejb.EJBLocalHome {} /* Bad name 
+		*/ public interface MissingProperSuffix extends javax.ejb.EJBLocalHome {} -->
+	<!--rule ref="rulesets/java/j2ee.xml/LocalHomeNamingConvention"/ -->
+	<!--远程接口命名规则：会话EJB的远程接口应该没有后缀。 代码示例： /* Bad Session suffix */ public interface 
+		BadSuffixSession extends javax.ejb.EJBObject {} /* Bad EJB suffix */ public 
+		interface BadSuffixEJB extends javax.ejb.EJBObject {} /* Bad Bean suffix 
+		*/ public interface BadSuffixBean extends javax.ejb.EJBObject {} -->
+	<!--rule ref="rulesets/java/j2ee.xml/RemoteInterfaceNamingConvention"/ -->
+	<!--不要调用System.exit:web应用不该调用System.exit(),因为只有web容器或应用服务器才能停止JVM. -->
+	<!--rule ref="rulesets/java/j2ee.xml/DoNotCallSystemExit"/ -->
+	<!--静态EJB域应该是final的：根据J2EE规范(p.494),EJB不应该有任何具有写入访问权的静态域，然而，只读静态域是允许的。这样能够保证合适的行为，尤其当实例分布存在于多个JRE的容器中 -->
+	<!--rule ref="rulesets/java/j2ee.xml/StaticEJBFieldShouldBeFinal"/ -->
+	<!--不用使用线程：J2EE规范明确禁止使用线程。备注：意思是已经由J2EE规范和成熟类库帮你封装了线程处理，自己尽量不要用线程。 -->
+	<!--rule ref="rulesets/java/j2ee.xml/DoNotUseThreads"/ -->
+	<!--====================j2ee Rules end====================== -->
+
+
+	<!--====================logging-jakarta-commons Rules begin（共2个）====================== -->
+	<!--使用正确的异常日志：保证打印出完全的异常堆栈，记录或抛出异常日志时使用包含两个参数的表达式：一个参数是字符串，一个是Throwable类型 -->
+	<!--rule ref="rulesets/java/logging-jakarta-commons.xml/UseCorrectExceptionLogging"/ -->
+	<!--合适的日志记录器：日志记录器一般应该被定义为private static final的，而且应该有正确的类。Private final 
+		Log log;也被允许使用在需要传递的这种极少的情况中，具有这种限制日志记录器就需要被传入构造器中。 -->
+	<!-- <rule ref="rulesets/java/logging-jakarta-commons.xml/ProperLogger"> 
+		<properties> <property name="staticLoggerName" value="log"/> </properties> 
+		</rule> -->
+	<!--====================logging-jakarta-commons Rules end====================== -->
+
+
+	<!--====================logging-java Rules begin（共4个）====================== -->
+	<!--多于一个日志记录器：一般而言一个日志记录器只用于一个类中。 -->
+	<rule ref="rulesets/java/logging-java.xml/MoreThanOneLogger" />
+	<!--日志记录器不是static final的：大多数情况下，日志记录器应该被定义为static和final的 -->
+	<!--rule ref="rulesets/java/logging-java.xml/LoggerIsNotStaticFinal"/ -->
+	<!--SystemPrintln：如果发现代码当中使用了System.(out|err).print,应考虑使用日志记录代替 -->
+	<rule ref="rulesets/java/logging-java.xml/SystemPrintln" />
+	<!--避免使用PrintStackTrace:避免使用printStackTrace();使用日志记录器代替。 -->
+	<rule ref="rulesets/java/logging-java.xml/AvoidPrintStackTrace" />
+	<!--====================logging-java Rules end====================== -->
+
+
+	<!--====================naming Rules begin（共18个）====================== -->
+	<!--短变量：检测出域或参数的名字命名非常短。 -->
+	<!--rule ref="rulesets/java/naming.xml/ShortVariable"/ -->
+	<!--长变量：检测出域或参数的名字命名非常长。 -->
+	<!-- <rule ref="rulesets/java/naming.xml/LongVariable"> <properties> <property 
+		name="minimum" value="40"/> </properties> </rule> -->
+	<!--短方法名：检测出方法命名太短。 -->
+	<!-- rule ref="rulesets/java/naming.xml/ShortMethodName" /-->
+	<!--变量命名约定：变量命名规则-根据你的喜好调整。当前规则检查final类型变量应该全部大写而且非final变量应该不包含下划线。 -->
+	<rule ref="rulesets/java/naming.xml/VariableNamingConventions" />
+	<!--方法命名约定：方法命名应该总是以小写字符开头，而且不应该包含下划线。 -->
+	<rule ref="rulesets/java/naming.xml/MethodNamingConventions" />
+	<!--类命名约定：类名应该总是以大写字符开头 -->
+	<rule ref="rulesets/java/naming.xml/ClassNamingConventions" />
+	<!--抽象类命名：抽象类应该命名为‘AbstractXXX’ -->
+	<!--rule ref="rulesets/java/naming.xml/AbstractNaming"/ -->
+	<!--避免美元符号：在变量/方法/类/接口中避免使用美元符号。 -->
+	<rule ref="rulesets/java/naming.xml/AvoidDollarSigns" />
+	<!--方法和封装类同名：非构造方法不能和封装类同名 -->
+	<rule ref="rulesets/java/naming.xml/MethodWithSameNameAsEnclosingClass" />
+	<!--令人疑惑的hashCode方法名：方法名和返回值类似于hashCode()，将令人误解为你试图覆盖hashCode()方法。 -->
+	<rule ref="rulesets/java/naming.xml/SuspiciousHashcodeMethodName" />
+	<!--令人疑惑的常量字段名：一个字段的名称全部用大些字符表示是Sun的JAVA命名规则，表示这个是常量。然而，字段不是final的。 -->
+	<rule ref="rulesets/java/naming.xml/SuspiciousConstantFieldName" />
+	<!--令人迷惑的equals方法名：方法名和参数近似于equals(Object)，可能让人迷惑为你想覆盖equals(Object)方法 -->
+	<rule ref="rulesets/java/naming.xml/SuspiciousEqualsMethodName" />
+	<!--避免属性和类同名：属性和类同名易造成误解，这可能意味着类型或属性名可以命名的更精确 -->
+	<rule ref="rulesets/java/naming.xml/AvoidFieldNameMatchingTypeName" />
+	<!--避免属性和方法同名：属性和方法同名易造成误解。即使这是完全合法的，但信息(属性)和动作(方法)都没有清晰地命名。 -->
+	<rule ref="rulesets/java/naming.xml/AvoidFieldNameMatchingMethodName" />
+	<!--没有包：检测到类或接口没有定义在包里面。 -->
+	<rule ref="rulesets/java/naming.xml/NoPackage" />
+	<!--包的大小写：检测到包的定义中包含大写字符 -->
+	<rule ref="rulesets/java/naming.xml/PackageCase" />
+	<!--令人迷惑的变量名：检测到非字段类型以m_开头，这通常表示这是一个字段所以这种做法让人迷惑。 -->
+	<!--rule ref="rulesets/java/naming.xml/MIsLeadingVariableName" /-->
+	<!--返回布尔类型的方法命名：发现返回布尔类型的方法被命名为’getX()’,而惯例是命名为‘isX()’的形式。 -->
+	<rule ref="rulesets/java/naming.xml/BooleanGetMethodName">
+		<properties>
+			<property name="checkParameterizedMethods" value="false" />
+		</properties>
+	</rule>
+	<!--============================naming Rules end================================ -->
+
+
+	<!--====================optimization Rules begin（共10个）====================== -->
+	<!--本地变量可以是Final的：本地变量只被赋值一次可以声明为final的 -->
+	<!--rule ref="rulesets/java/optimizations.xml/LocalVariableCouldBeFinal"/ -->
+	<!--方法参数可以是Final的：传入方法的参数从不被赋值可以声明为final的 -->
+	<!--rule ref="rulesets/java/optimizations.xml/MethodArgumentCouldBeFinal"/ -->
+	<!--避免在循环中实例化对象：本规则检查在循环的内部用new创建对象 -->
+	<!--rule ref="rulesets/java/optimizations.xml/AvoidInstantiatingObjectsInLoops"/ -->
+	<!--使用ArrayList代替Vector：ArrayList是比Vector更好的集合类实现 -->
+	<rule ref="rulesets/java/optimizations.xml/UseArrayListInsteadOfVector" />
+	<!--简化StartWith：字符串中截取长度为1的字串时，可以用高率一点的String.charAt()代替String.startsWith() -->
+	<!--rule ref="rulesets/java/optimizations.xml/SimplifyStartsWith"/ -->
+	<!--使用StringBuffer来进行字串append操作：查找使用+=来连接字串的不良方式 -->
+	<!--rule ref="rulesets/java/optimizations.xml/UseStringBufferForStringAppends"/ -->
+	<!--使用Arrays类的asList方法：java.util.Arrays类有一个asList方法，当你试图将一个对象数组转换为一个List时应该使用这个方法，这比循环从数据拷贝元素快得多。 -->
+	<rule ref="rulesets/java/optimizations.xml/UseArraysAsList" />
+	<!--避免数组循环：拷贝数组用System.arraycopy代替循环拷贝数组元素 -->
+	<rule ref="rulesets/java/optimizations.xml/AvoidArrayLoops" />
+	<!--不必要的包装对象创建：解析方法应该被直接调用 -->
+	<rule
+		ref="rulesets/java/optimizations.xml/UnnecessaryWrapperObjectCreation" />
+	<!--加空字符串：发现+“”操作。这是将其他类型转换为字符串的低效的做法 -->
+	<!--rule ref="rulesets/java/optimizations.xml/AddEmptyString"/ -->
+	<!--====================optimization Rules end====================== -->
+
+
+	<!--====================strictexception Rules begin（共9个）====================== -->
+	<!--避免catch Throwable对象：这是危险的因为覆盖的范围太广，它能够catch类似于OutOfMemoryError这样的错误 -->
+	<rule ref="rulesets/java/strictexception.xml/AvoidCatchingThrowable" />
+	<!--具体声明抛出的异常：不确定方法中能够抛出什么样的具体异常。为模糊的接口提供证明并理解它是很困难的。抛出的异常类要么从RuntimeException中继承或者抛出一个被检查的异常。 -->
+	<rule
+		ref="rulesets/java/strictexception.xml/SignatureDeclareThrowsException" />
+	<!--异常用作流程控制：使用异常来做流程控制会导致goto类型的代码，且使得调试的时候发生的真正的异常含糊化。 -->
+	<rule ref="rulesets/java/strictexception.xml/ExceptionAsFlowControl" />
+	<!--避免捕获空指针异常：在正常情形下代码不应该捕获NullPointException。否则Catch块可能隐藏原始错误，导致其他更多微妙的错误。 -->
+	<rule ref="rulesets/java/strictexception.xml/AvoidCatchingNPE" />
+	<!--避免抛出原始异常类型：避免抛出特定异常类型。与其抛出RuntimeException，Throwable，Exception，Error等原始类型，不如用他们的子异常或子错误类来替代。 -->
+	<rule
+		ref="rulesets/java/strictexception.xml/AvoidThrowingRawExceptionTypes" />
+	<!--避免抛出空指针异常：避免抛出空指针异常——这会导致误解，因为大部分人认为这应该由虚拟机抛出。考虑用IllegalArgumentException代替，这对于开发者定义异常来说比较清晰。 -->
+	<!--rule ref="rulesets/java/strictexception.xml/AvoidThrowingNullPointerException"/ -->
+	<!--避免重复抛出异常：catch块仅仅重新抛出一个已捕获的异常只会增加代码量和程序运行的复杂度。 -->
+	<rule ref="rulesets/java/strictexception.xml/AvoidRethrowingException" />
+	<!--不要继承java.lang.Error:Error是系统异常，不要继承它。 -->
+	<rule ref="rulesets/java/strictexception.xml/DoNotExtendJavaLangError" />
+	<!--不要在finally块中抛出异常：在finally块中抛出异常易造成迷惑。它将掩盖代码异常或缺陷，也促使代码不稳定。备注：这是PMD从Lint4j原则衍生实现的 -->
+	<rule ref="rulesets/java/strictexception.xml/DoNotThrowExceptionInFinally" />
+	<!--====================strictexception Rules end====================== -->
+
+
+	<!--====================sunsecure Rules begin（共2个）====================== -->
+	<!--方法返回内部数组：暴露内部数组直接允许用户修改的代码会是非常危险的，返回一个数组的copy是安全的做法 -->
+	<!--rule ref="rulesets/java/sunsecure.xml/MethodReturnsInternalArray"/ -->
+	<!--数组被直接存储：构造器和方法接收数组应该clone对象并保存副本，这会阻止用户将来的改变影响内部的功能。 -->
+	<!--rule ref="rulesets/java/sunsecure.xml/ArrayIsStoredDirectly"/ -->
+	<!--==========================sunsecure Rules end=========================== -->
+
+
+	<!--============String and StringBuffer Rules Rules begin（共15个）=============== -->
+	<!--避免重复的字面量：代码包含重复的字符串常常可以重构为将此字符串声明为常量 -->
+	<!-- <rule ref="rulesets/java/strings.xml/AvoidDuplicateLiterals"> <properties> 
+		<property name="threshold" value="4"/> </properties> </rule> -->
+	<!--字符串初始化：避免初始化字符串对象；这是不必要的。 -->
+	<rule ref="rulesets/java/strings.xml/StringInstantiation" />
+	<!--String.toString():避免对字符串对象调用toString()方法，这是不必要的 -->
+	<rule ref="rulesets/java/strings.xml/StringToString" />
+	<!--低效的StringBuffering：避免在StringBuffer的构造器或append()方法中连接非字面量类型 -->
+	<!--rule ref="rulesets/java/strings.xml/InefficientStringBuffering"/ -->
+	<!--不必要的大小写转换：使用equalsIgnoreCase()比将字符串大小写转换一致后再比较要快。 -->
+	<rule ref="rulesets/java/strings.xml/UnnecessaryCaseChange" />
+	<!--使用StringBuffer的length()方法：使用StringBuffer对象的length()方法来计算StringBuffer对象的长度，而不是使用StringBuffer.toString().equals("") 
+		or StringBuffer.toString().length() ==.等方法 -->
+	<rule ref="rulesets/java/strings.xml/UseStringBufferLength" />
+	<!--用char类型连接字符：在使用StringBuffer的append()方法连接字符时，避免使用string类型。 -->
+	<rule ref="rulesets/java/strings.xml/AppendCharacterWithChar" />
+	<!--连续的字面量连接：连接字符串时连续的调用StringBuffer的append()方法 -->
+	<!-- <rule ref="rulesets/java/strings.xml/ConsecutiveLiteralAppends"> <properties> 
+		<property name="threshold" value="1"/> </properties> </rule> -->
+	<!--使用indexOf(字符)：当你检测单个字符的位置时使用String.indexOf(字符)，它执行的很快。不要使用indexOf(字符串) -->
+	<!--rule ref="rulesets/java/strings.xml/UseIndexOfChar"/ -->
+	<!--低效的空字符串检查：用String.trim().length()来判断字符串是否空是低效的做法，因为它会创建一个新的字符串对象然后判断大小。考虑创建一个静态的方法循环String，用isWhitespace()检查每个字符如果遇到非空白字符就返回false -->
+	<!--rule ref="rulesets/java/strings.xml/InefficientEmptyStringCheck"/ -->
+	<!--不充分的StringBuffer声明：如果不能在事前声明合适大小的StringBuffer容量可能导致运行期不断地重新分配大小。本规则检查字符事实上传递给StringBuffer.append()，但是表明了在最坏情况下的最好的预测。空参数的StringBuffer构造器默认将对象初始化为16个字符的容量。这个默认情况是在构造长度无法确定的情况下假定的。 -->
+	<!--rule ref="rulesets/java/strings.xml/InsufficientStringBufferDeclaration"/ -->
+	<!--无用的valueOf方法：调用append()方法时不需要把参数用valueOf()转换一次，直接将非String类型的值作为参数放在append()里面。 -->
+	<rule ref="rulesets/java/strings.xml/UselessStringValueOf" />
+	<!--StringBuffer使用字符初始化：StringBuffer sb = new StringBuffer('c');字符c会转换为int值，作为StringBuffer的初始化大小参数。 -->
+	<rule ref="rulesets/java/strings.xml/StringBufferInstantiationWithChar" />
+	<!--使用equals方法比较字符串：使用‘==’或‘！=’比较字符串大小只是比较两边的常量池的引用。 -->
+	<rule ref="rulesets/java/strings.xml/UseEqualsToCompareStrings" />
+	<!--避免在类中使用StringBuffer属性：StringBuffer类型变量可以变得非常庞大，所以可能造成内存泄漏。（如果宿主类有很长的生命期） -->
+	<!--rule ref="rulesets/java/strings.xml/AvoidStringBufferField"/ -->
+	<!--===========================strings Rules end============================= -->
+
+
+	<!--====================unusedcode Rules begin（共4个）====================== -->
+	<!--未用的私有变量：检测到私有变量被声明或被赋值，但是未使用 -->
+	<rule ref="rulesets/java/unusedcode.xml/UnusedPrivateField" />
+	<!--未用的本地变量：检测到本地变量被声明或被赋值，但是未使用 -->
+	<rule ref="rulesets/java/unusedcode.xml/UnusedLocalVariable" />
+	<!--未用的私有方法：检测到已声明但未使用的私有方法 -->
+	<rule ref="rulesets/java/unusedcode.xml/UnusedPrivateMethod" />
+	<!--未用的常规参数：避免传递给方法或构造器不使用的参数 -->
+	<rule ref="rulesets/java/unusedcode.xml/UnusedFormalParameter" />
+	<!--=======================unusedcode Rules end============================== -->
+</ruleset> 

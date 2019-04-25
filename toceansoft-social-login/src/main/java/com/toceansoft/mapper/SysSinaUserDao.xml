@@ -1,0 +1,349 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.toceansoft.common.sociallogin.dao.SysSinaUserDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+	<resultMap type="com.toceansoft.common.sociallogin.entity.SysSinaUserEntity"
+		id="sysSinaUserMap">
+		<result property="sinaUserId" column="sina_user_id" />
+		<result property="idstr" column="idstr" />
+		<result property="screenname" column="screenName" />
+		<result property="name" column="name" />
+		<result property="province" column="province" />
+		<result property="city" column="city" />
+		<result property="location" column="location" />
+		<result property="description" column="description" />
+		<result property="profileimageurl" column="profileImageUrl" />
+		<result property="url" column="url" />
+		<result property="weihao" column="weihao" />
+		<result property="gender" column="gender" />
+		<result property="createdat" column="createdAt" />
+	</resultMap>
+	<!--动态查询条件 -->
+	<sql id="Dynamic_Where_Clause">
+		<if test="criteriaList != null">
+			<foreach collection="criteriaList" item="criteria" index="index0">
+				<trim prefix="(" suffix=")">
+					<foreach collection="criteria.criteria" item="criterion"
+						index="index">
+						<choose>
+							<when test="criterion.noValue">
+								${criterion.condition}
+							</when>
+							<when test="criterion.singleValue">
+								${criterion.condition} #{criterion.value}
+							</when>
+							<when test="criterion.betweenValue">
+								${criterion.condition} #{criterion.value} AND
+								#{criterion.secondValue}
+							</when>
+							<when test="criterion.listValue">
+								${criterion.condition}
+								<foreach collection="criterion.value" item="listItem"
+									open="(" close=")" separator=",">
+									#{listItem}
+								</foreach>
+							</when>
+						</choose>
+						<if test="index != criteria.criteria.size-1"> ${criterion.conditionRelationship} </if>
+					</foreach>
+				</trim>
+				<if test="index0 != criteriaList.size-1"> ${criteria.conditionRelationship} </if>
+			</foreach>
+		</if>
+	</sql>
+
+	<sql id="orderBy_case">
+		ORDER BY
+		<choose>
+			<when test="orderByList !=null">
+				<foreach collection="orderByList" item="orderBy" separator=",">
+					${orderBy.condition} ${orderBy.direction}
+				</foreach>
+			</when>
+			<otherwise>
+				sina_user_id desc
+			</otherwise>
+		</choose>
+	</sql>
+
+	<select id="queryObject"
+		resultType="com.toceansoft.common.sociallogin.entity.SysSinaUserEntity">
+		select * from sys_sina_user where sina_user_id = #{value}
+	</select>
+	<select id="queryByIdstr"
+		resultType="com.toceansoft.common.sociallogin.entity.SysSinaUserEntity">
+		select * from sys_sina_user where idstr = #{value}
+	</select>
+
+	<!--Mybatis 中$与#的区别 -->
+	<!--#是将传入的值当做字符串的形式, 使用#可以很大程度上防止sql注入 -->
+	<!--$是将传入的数据直接显示生成sql语句,但是如果使用在order by 中就需要使用 $ -->
+	<select id="queryList"
+		resultType="com.toceansoft.common.sociallogin.entity.SysSinaUserEntity">
+		select * from sys_sina_user
+		<choose>
+			<when test="sidx != null and sidx.trim() != ''">
+				order by ${sidx} ${order}
+			</when>
+			<otherwise>
+				order by sina_user_id desc
+			</otherwise>
+		</choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+
+	<select id="queryListByConditionUgly"
+		resultType="com.toceansoft.common.sociallogin.entity.SysSinaUserEntity">
+		select * from sys_sina_user
+		<where>
+			<if test="sina_user_id != null">
+				`sina_user_id` = #{sina_user_id} and
+			</if>
+			<if test="idstr != null">
+				`idstr` = #{idstr} and
+			</if>
+			<if test="screenName != null">
+				`screenName` = #{screenName} and
+			</if>
+			<if test="name != null">
+				`name` = #{name} and
+			</if>
+			<if test="province != null">
+				`province` = #{province} and
+			</if>
+			<if test="city != null">
+				`city` = #{city} and
+			</if>
+			<if test="location != null">
+				`location` = #{location} and
+			</if>
+			<if test="description != null">
+				`description` = #{description} and
+			</if>
+			<if test="profileImageUrl != null">
+				`profileImageUrl` = #{profileImageUrl} and
+			</if>
+			<if test="url != null">
+				`url` = #{url} and
+			</if>
+			<if test="weihao != null">
+				`weihao` = #{weihao} and
+			</if>
+			<if test="gender != null">
+				`gender` = #{gender} and
+			</if>
+			<if test="createdAt != null">
+				`createdAt` = #{createdAt}
+			</if>
+		</where>
+		<choose>
+			<when test="sidx != null and sidx.trim() != ''">
+				order by ${sidx} ${order}
+			</when>
+			<otherwise>
+				order by sina_user_id desc
+			</otherwise>
+		</choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	<select id="queryListByCondition"
+		resultType="com.toceansoft.common.sociallogin.entity.SysSinaUserEntity">
+		select
+		<if test="distinct == true">distinct</if>
+		* from sys_sina_user
+		<where>
+			<include refid="Dynamic_Where_Clause" />
+		</where>
+		<include refid="orderBy_case" />
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+
+	<select id="queryTotal" resultType="int">
+		select count(*) from
+		sys_sina_user
+	</select>
+	<select id="queryTotalByConditionUgly" resultType="int">
+		select count(*) from sys_sina_user
+		<where>
+			<if test="sina_user_id != null">
+				`sina_user_id` = #{sina_user_id} and
+			</if>
+			<if test="idstr != null">
+				`idstr` = #{idstr} and
+			</if>
+			<if test="screenName != null">
+				`screenName` = #{screenName} and
+			</if>
+			<if test="name != null">
+				`name` = #{name} and
+			</if>
+			<if test="province != null">
+				`province` = #{province} and
+			</if>
+			<if test="city != null">
+				`city` = #{city} and
+			</if>
+			<if test="location != null">
+				`location` = #{location} and
+			</if>
+			<if test="description != null">
+				`description` = #{description} and
+			</if>
+			<if test="profileImageUrl != null">
+				`profileImageUrl` = #{profileImageUrl} and
+			</if>
+			<if test="url != null">
+				`url` = #{url} and
+			</if>
+			<if test="weihao != null">
+				`weihao` = #{weihao} and
+			</if>
+			<if test="gender != null">
+				`gender` = #{gender} and
+			</if>
+			<if test="createdAt != null">
+				`createdAt` = #{createdAt}
+			</if>
+		</where>
+	</select>
+	<select id="queryTotalByCondition" resultType="int">
+		select count(*) from sys_sina_user
+		<where>
+			<include refid="Dynamic_Where_Clause" />
+		</where>
+	</select>
+
+	<insert id="save"
+		parameterType="com.toceansoft.common.sociallogin.entity.SysSinaUserEntity"
+		useGeneratedKeys="true" keyProperty="sinaUserId">
+		insert into sys_sina_user
+		(
+		`idstr`,
+		`screenName`,
+		`name`,
+		`province`,
+		`city`,
+		`location`,
+		`description`,
+		`profileImageUrl`,
+		`url`,
+		`weihao`,
+		`gender`,
+		`createdAt`
+		)
+		values
+		(
+		#{idstr},
+		#{screenname},
+		#{name},
+		#{province},
+		#{city},
+		#{location},
+		#{description},
+		#{profileimageurl},
+		#{url},
+		#{weihao},
+		#{gender},
+		#{createdat}
+		)
+	</insert>
+	<insert id="saveBatch" parameterType="java.util.List"
+		useGeneratedKeys="true" keyProperty="sinaUserId">
+		insert into sys_sina_user
+		(
+		`idstr`,
+		`screenName`,
+		`name`,
+		`province`,
+		`city`,
+		`location`,
+		`description`,
+		`profileImageUrl`,
+		`url`,
+		`weihao`,
+		`gender`,
+		`createdAt`
+		)
+		values
+		<foreach collection="list" item="item" index="index"
+			separator=",">
+			(
+			#{item.idstr},
+			#{item.screenname},
+			#{item.name},
+			#{item.province},
+			#{item.city},
+			#{item.location},
+			#{item.description},
+			#{item.profileimageurl},
+			#{item.url},
+			#{item.weihao},
+			#{item.gender},
+			#{item.createdat}
+			)
+		</foreach>
+	</insert>
+
+	<update id="update"
+		parameterType="com.toceansoft.common.sociallogin.entity.SysSinaUserEntity">
+		<foreach collection="list" item="item" index="index" open=""
+			close="" separator=";">
+			update sys_sina_user
+			<set>
+				<if test="idstr != null">`idstr` = #{item.idstr}, </if>
+				<if test="screenname != null">`screenName` = #{item.screenname}, </if>
+				<if test="name != null">`name` = #{item.name}, </if>
+				<if test="province != null">`province` = #{item.province}, </if>
+				<if test="city != null">`city` = #{item.city}, </if>
+				<if test="location != null">`location` = #{item.location}, </if>
+				<if test="description != null">`description` = #{item.description}, </if>
+				<if test="profileimageurl != null">`profileImageUrl` = #{item.profileimageurl}, </if>
+				<if test="url != null">`url` = #{item.url}, </if>
+				<if test="weihao != null">`weihao` = #{item.weihao}, </if>
+				<if test="gender != null">`gender` = #{item.gender}, </if>
+				<if test="createdat != null">`createdAt` = #{item.createdat}</if>
+			</set>
+			where sina_user_id = #{item.sinaUserId}
+		</foreach>
+	</update>
+
+	<!-- 注意，以下SQL语句为MySQL，如果采用其他数据库，可能要改写SQL -->
+	<update id="updateBatch" parameterType="java.util.List">
+		replace into sys_sina_user
+		(
+		`sina_user_id`, `idstr`, `screenName`, `name`, `province`, `city`, `location`,
+		`description`, `profileImageUrl`, `url`, `weihao`, `gender`,
+		`createdAt` )
+		values
+		<foreach collection="list" item="item" index="index"
+			separator=",">
+			(
+			#{item.sinaUserId}, #{item.idstr}, #{item.screenname}, #{item.name}, #{item.province},
+			#{item.city}, #{item.location}, #{item.description},
+			#{item.profileimageurl}, #{item.url}, #{item.weihao}, #{item.gender},
+			#{item.createdat} )
+		</foreach>
+	</update>
+
+	<delete id="delete">
+		delete from sys_sina_user where sina_user_id =
+		#{value}
+	</delete>
+
+	<delete id="deleteBatch">
+		delete from sys_sina_user where sina_user_id in
+		<foreach item="sinaUserId" collection="array" open="("
+			separator="," close=")">
+			#{sinaUserId}
+		</foreach>
+	</delete>
+
+</mapper>

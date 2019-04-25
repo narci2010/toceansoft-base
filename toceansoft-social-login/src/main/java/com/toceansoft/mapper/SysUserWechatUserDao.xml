@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.toceansoft.common.sociallogin.dao.SysUserWechatUserDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+	<resultMap
+		type="com.toceansoft.common.sociallogin.entity.SysUserWechatUserEntity"
+		id="sysUserWechatUserMap">
+		<result property="userId" column="user_id" />
+		<result property="wechatUserId" column="wechat_user_id" />
+	</resultMap>
+	<!--动态查询条件 -->
+	<sql id="Dynamic_Where_Clause">
+		<if test="criteriaList != null">
+			<foreach collection="criteriaList" item="criteria" index="index0">
+				<trim prefix="(" suffix=")">
+					<foreach collection="criteria.criteria" item="criterion"
+						index="index">
+						<choose>
+							<when test="criterion.noValue">
+								${criterion.condition}
+							</when>
+							<when test="criterion.singleValue">
+								${criterion.condition} #{criterion.value}
+							</when>
+							<when test="criterion.betweenValue">
+								${criterion.condition} #{criterion.value} AND
+								#{criterion.secondValue}
+							</when>
+							<when test="criterion.listValue">
+								${criterion.condition}
+								<foreach collection="criterion.value" item="listItem"
+									open="(" close=")" separator=",">
+									#{listItem}
+								</foreach>
+							</when>
+						</choose>
+						<if test="index != criteria.criteria.size-1"> ${criterion.conditionRelationship} </if>
+					</foreach>
+				</trim>
+				<if test="index0 != criteriaList.size-1"> ${criteria.conditionRelationship} </if>
+			</foreach>
+		</if>
+	</sql>
+
+	<sql id="orderBy_case">
+		ORDER BY
+		<choose>
+			<when test="orderByList !=null">
+				<foreach collection="orderByList" item="orderBy" separator=",">
+					${orderBy.condition} ${orderBy.direction}
+				</foreach>
+			</when>
+			<otherwise>
+				user_id desc
+			</otherwise>
+		</choose>
+	</sql>
+
+	<select id="queryObject"
+		resultType="com.toceansoft.common.sociallogin.entity.SysUserWechatUserEntity">
+		select * from sys_user_wechat_user where user_id = #{value}
+	</select>
+	<select id="queryByWechatUserId"
+		resultType="com.toceansoft.common.sociallogin.entity.SysUserWechatUserEntity">
+		select * from sys_user_wechat_user where wechat_user_id = #{value}
+	</select>
+
+	<!--Mybatis 中$与#的区别 -->
+	<!--#是将传入的值当做字符串的形式, 使用#可以很大程度上防止sql注入 -->
+	<!--$是将传入的数据直接显示生成sql语句,但是如果使用在order by 中就需要使用 $ -->
+	<select id="queryList"
+		resultType="com.toceansoft.common.sociallogin.entity.SysUserWechatUserEntity">
+		select * from sys_user_wechat_user
+		<choose>
+			<when test="sidx != null and sidx.trim() != ''">
+				order by ${sidx} ${order}
+			</when>
+			<otherwise>
+				order by user_id desc
+			</otherwise>
+		</choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+
+	<select id="queryListByConditionUgly"
+		resultType="com.toceansoft.common.sociallogin.entity.SysUserWechatUserEntity">
+		select * from sys_user_wechat_user
+		<where>
+			<if test="user_id != null">
+				`user_id` = #{user_id} and
+			</if>
+			<if test="wechat_user_id != null">
+				`wechat_user_id` = #{wechat_user_id}
+			</if>
+		</where>
+		<choose>
+			<when test="sidx != null and sidx.trim() != ''">
+				order by ${sidx} ${order}
+			</when>
+			<otherwise>
+				order by user_id desc
+			</otherwise>
+		</choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	<select id="queryListByCondition"
+		resultType="com.toceansoft.common.sociallogin.entity.SysUserWechatUserEntity">
+		select
+		<if test="distinct == true">distinct</if>
+		* from sys_user_wechat_user
+		<where>
+			<include refid="Dynamic_Where_Clause" />
+		</where>
+		<include refid="orderBy_case" />
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+
+	<select id="queryTotal" resultType="int">
+		select count(*) from
+		sys_user_wechat_user
+	</select>
+	<select id="queryTotalByConditionUgly" resultType="int">
+		select count(*) from sys_user_wechat_user
+		<where>
+			<if test="user_id != null">
+				`user_id` = #{user_id} and
+			</if>
+			<if test="wechat_user_id != null">
+				`wechat_user_id` = #{wechat_user_id}
+			</if>
+		</where>
+	</select>
+	<select id="queryTotalByCondition" resultType="int">
+		select count(*) from sys_user_wechat_user
+		<where>
+			<include refid="Dynamic_Where_Clause" />
+		</where>
+	</select>
+
+	<insert id="save"
+		parameterType="com.toceansoft.common.sociallogin.entity.SysUserWechatUserEntity">
+		insert into sys_user_wechat_user
+		(
+		`user_id`,
+		`wechat_user_id`
+		)
+		values
+		(
+		#{userId},
+		#{wechatUserId}
+		)
+	</insert>
+	<insert id="saveBatch" parameterType="java.util.List">
+		insert into sys_user_wechat_user
+		(
+		`user_id`,
+		`wechat_user_id`
+		)
+		values
+		<foreach collection="list" item="item" index="index"
+			separator=",">
+			(
+			#{item.userId},
+			#{item.wechatUserId}
+			)
+		</foreach>
+	</insert>
+
+	<update id="update"
+		parameterType="com.toceansoft.common.sociallogin.entity.SysUserWechatUserEntity">
+		<foreach collection="list" item="item" index="index" open=""
+			close="" separator=";">
+			update sys_user_wechat_user
+			<set>
+				<if test="wechatUserId != null">`wechat_user_id` = #{item.wechatUserId}</if>
+			</set>
+			where user_id = #{item.userId}
+		</foreach>
+	</update>
+
+	<!-- 注意，以下SQL语句为MySQL，如果采用其他数据库，可能要改写SQL -->
+	<update id="updateBatch" parameterType="java.util.List">
+		replace into sys_user_wechat_user
+		(
+		`user_id`, `wechat_user_id` )
+		values
+		<foreach collection="list" item="item" index="index"
+			separator=",">
+			(
+			#{item.userId}, #{item.wechatUserId} )
+		</foreach>
+	</update>
+
+	<delete id="delete">
+		delete from sys_user_wechat_user where wechat_user_id =
+		#{value}
+	</delete>
+
+	<delete id="deleteBatch">
+		delete from sys_user_wechat_user where user_id in
+		<foreach item="userId" collection="array" open="(" separator=","
+			close=")">
+			#{userId}
+		</foreach>
+	</delete>
+
+</mapper>

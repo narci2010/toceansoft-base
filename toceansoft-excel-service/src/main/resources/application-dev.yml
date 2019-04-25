@@ -1,0 +1,58 @@
+spring:
+    datasource:
+        type: com.alibaba.druid.pool.DruidDataSource
+        driverClassName: com.mysql.jdbc.Driver
+        druid:
+            first:
+                url: jdbc:mysql://192.168.3.93:3306/tocean_excel_service?allowMultiQueries=true&useUnicode=true&characterEncoding=UTF-8
+                username: root
+                password: toceanadmin123
+            second:
+                url: jdbc:mysql://192.168.3.93:3306/information_schema?allowMultiQueries=true&useUnicode=true&characterEncoding=UTF-8
+                username: root
+                password: toceanadmin123
+            initial-size: 10
+            max-active: 100
+            min-idle: 10
+            max-wait: 60000
+            pool-prepared-statements: true
+            max-pool-prepared-statement-per-connection-size: 20
+            time-between-eviction-runs-millis: 60000
+            min-evictable-idle-time-millis: 300000
+            validation-query: SELECT 1 FROM DUAL
+            test-while-idle: true
+            test-on-borrow: false
+            test-on-return: false
+            stat-view-servlet:
+                enabled: true
+                url-pattern: /druid/*
+                #login-username: admin
+                #login-password: admin
+            filter:
+                stat:
+                    log-slow-sql: true
+                    slow-sql-millis: 1000
+                    merge-sql: true
+                wall:
+                    config:
+                        multi-statement-allow: true
+
+    #下面配置+pom.xml引入date-redis包，即可实现session存储在redis中，为集群服务  
+    redis:
+        #open: false  # 是否开启redis缓存  true开启   false关闭
+        database: 0
+        host: 192.168.3.93
+        port: 6379
+        password:       # 密码（默认为空）
+        timeout: 6000  # 连接超时时长（毫秒）
+            
+# 跨域相关配置
+cors: 
+  allowedheaders: Content-Type, Access-Control-Allow-Headers, Authorization,X-Requested-With
+  exposedheaders: Content-Type, Access-Control-Allow-Headers, Authorization,X-Requested-With
+  allowedmethods: GET,HEAD,POST,PUT,PATCH,DELETE,OPTIONS,TRACE
+  allowedorigins: http://localhost:8080, http://192.168.1.18:8080, http://192.168.1.133:8080
+
+
+
+

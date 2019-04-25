@@ -1,0 +1,280 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.toceansoft.sys.dao.SysDictDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.toceansoft.sys.entity.SysDictEntity" id="sysDictMap">
+        <result property="dictId" column="dict_id"/>
+        <result property="dictName" column="dict_name"/>
+        <result property="dictCode" column="dict_code"/>
+        <result property="description" column="description"/>
+        <result property="delFlag" column="del_flag"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+        <!--动态查询条件-->   
+    	<sql id="Dynamic_Where_Clause">
+		<if test="criteriaList != null">
+			<foreach collection="criteriaList" item="criteria" index="index0">
+				<trim prefix="(" suffix=")">
+					<foreach collection="criteria.criteria" item="criterion"
+						index="index">
+						<choose>
+							<when test="criterion.noValue">
+								${criterion.condition}
+							</when>
+							<when test="criterion.singleValue">
+								${criterion.condition} #{criterion.value}
+							</when>
+							<when test="criterion.betweenValue">
+								${criterion.condition} #{criterion.value} AND
+								#{criterion.secondValue}
+							</when>
+							<when test="criterion.listValue">
+								${criterion.condition}
+								<foreach collection="criterion.value" item="listItem"
+									open="(" close=")" separator=",">
+									#{listItem}
+								</foreach>
+							</when>
+						</choose>
+						<if test="index != criteria.criteria.size-1"> ${criterion.conditionRelationship} </if>
+					</foreach>
+				</trim>
+				<if test="index0 != criteriaList.size-1"> ${criteria.conditionRelationship} </if>
+			</foreach>
+		</if>
+	</sql>
+
+	<sql id="orderBy_case">
+		ORDER BY 
+		<choose>
+			<when test="orderByList !=null">
+				<foreach collection="orderByList" item="orderBy" separator=",">
+					${orderBy.condition} ${orderBy.direction}
+				</foreach>
+			</when>
+			<otherwise>
+				dict_id desc
+			</otherwise>
+		</choose>
+	</sql>
+
+	<select id="queryObject" resultType="com.toceansoft.sys.entity.SysDictEntity">
+		select * from sys_dict where dict_id = #{value}
+	</select>
+
+    <!--Mybatis 中$与#的区别 -->
+    <!--#是将传入的值当做字符串的形式, 使用#可以很大程度上防止sql注入 -->
+    <!--$是将传入的数据直接显示生成sql语句,但是如果使用在order by 中就需要使用 $ -->
+	<select id="queryList" resultType="com.toceansoft.sys.entity.SysDictEntity">
+		select * from sys_dict
+        <choose>
+            <when test="sidx != null and sidx.trim() != ''">
+                order by ${sidx} ${order}
+            </when>
+			<otherwise>
+                order by dict_id desc
+			</otherwise>
+        </choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+	<select id="queryListByConditionUgly" resultType="com.toceansoft.sys.entity.SysDictEntity">
+		select * from sys_dict
+		<where>
+    			    	   <if test="dict_id != null">
+		    	`dict_id` = #{dict_id} and
+		       </if>
+            	    	   <if test="dict_name != null">
+		    	`dict_name` = #{dict_name} and
+		       </if>
+            	    	   <if test="dict_code != null">
+		    	`dict_code` = #{dict_code} and
+		       </if>
+            	    	   <if test="description != null">
+		    	`description` = #{description} and
+		       </if>
+            	    	   <if test="del_flag != null">
+		    	`del_flag` = #{del_flag} and
+		       </if>
+            	    	   <if test="create_by != null">
+		    	`create_by` = #{create_by} and
+		       </if>
+            	    	   <if test="create_time != null">
+		    	`create_time` = #{create_time} and
+		       </if>
+            	    	   <if test="update_by != null">
+		    	`update_by` = #{update_by} and
+		       </if>
+            	    	   <if test="update_time != null">
+		    	`update_time` = #{update_time} and
+		       </if>
+                        1=1
+		</where>
+        <choose>
+            <when test="sidx != null and sidx.trim() != ''">
+                order by ${sidx} ${order}
+            </when>
+			<otherwise>
+                order by dict_id desc
+			</otherwise>
+        </choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	<select id="queryListByCondition" resultType="com.toceansoft.sys.entity.SysDictEntity">
+		select 
+		<if test="distinct == true">distinct</if> 
+		* from sys_dict
+		<where>
+			<include refid="Dynamic_Where_Clause" />
+		</where>
+		<include refid="orderBy_case" />
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+ 	<select id="queryTotal" resultType="int">
+		select count(*) from sys_dict 
+	</select>
+	<select id="queryTotalByConditionUgly" resultType="int">
+		select count(*) from sys_dict 
+		<where>
+    			    	   <if test="dict_id != null">
+		    	`dict_id` = #{dict_id} and
+		       </if>
+            	    	   <if test="dict_name != null">
+		    	`dict_name` = #{dict_name} and
+		       </if>
+            	    	   <if test="dict_code != null">
+		    	`dict_code` = #{dict_code} and
+		       </if>
+            	    	   <if test="description != null">
+		    	`description` = #{description} and
+		       </if>
+            	    	   <if test="del_flag != null">
+		    	`del_flag` = #{del_flag} and
+		       </if>
+            	    	   <if test="create_by != null">
+		    	`create_by` = #{create_by} and
+		       </if>
+            	    	   <if test="create_time != null">
+		    	`create_time` = #{create_time} and
+		       </if>
+            	    	   <if test="update_by != null">
+		    	`update_by` = #{update_by} and
+		       </if>
+            	    	   <if test="update_time != null">
+		    	`update_time` = #{update_time} and
+		       </if>
+                        1=1
+		</where>
+	</select>
+		<select id="queryTotalByCondition" resultType="int">
+		select count(*) from sys_dict 
+		<where>
+			<include refid="Dynamic_Where_Clause" />
+		</where>
+	</select>
+	 
+	<insert id="save" parameterType="com.toceansoft.sys.entity.SysDictEntity" useGeneratedKeys="true" keyProperty="dictId">
+		insert into sys_dict
+		(
+			`dict_name`, 
+			`dict_code`, 
+			`description`, 
+			`del_flag`, 
+			`create_by`, 
+			`create_time`, 
+			`update_by`, 
+			`update_time`
+		)
+		values
+		(
+			#{dictName}, 
+			#{dictCode}, 
+			#{description}, 
+			#{delFlag}, 
+			#{createBy}, 
+			#{createTime}, 
+			#{updateBy}, 
+			#{updateTime}
+		)
+	</insert>
+	<insert id="saveBatch" parameterType="java.util.List" useGeneratedKeys="true" keyProperty="dictId">
+		insert into sys_dict
+		(
+			`dict_name`, 
+			`dict_code`, 
+			`description`, 
+			`del_flag`, 
+			`create_by`, 
+			`create_time`, 
+			`update_by`, 
+			`update_time`
+		)
+		values
+        <foreach collection="list" item="item" index="index" separator=",">		
+		(
+			#{item.dictName}, 
+			#{item.dictCode}, 
+			#{item.description}, 
+			#{item.delFlag}, 
+			#{item.createBy}, 
+			#{item.createTime}, 
+			#{item.updateBy}, 
+			#{item.updateTime}
+		)
+      </foreach>		
+	</insert>	
+	 
+	<update id="update" parameterType="com.toceansoft.sys.entity.SysDictEntity">
+	  <foreach collection="list" item="item" index="index" open="" close="" separator=";">
+		update sys_dict 
+		<set>
+			<if test="dictName != null">`dict_name` = #{item.dictName}, </if>
+			<if test="dictCode != null">`dict_code` = #{item.dictCode}, </if>
+			<if test="description != null">`description` = #{item.description}, </if>
+			<if test="delFlag != null">`del_flag` = #{item.delFlag}, </if>
+			<if test="createBy != null">`create_by` = #{item.createBy}, </if>
+			<if test="createTime != null">`create_time` = #{item.createTime}, </if>
+			<if test="updateBy != null">`update_by` = #{item.updateBy}, </if>
+			<if test="updateTime != null">`update_time` = #{item.updateTime}</if>
+		</set>
+		where dict_id = #{item.dictId}
+	  </foreach>  	
+	</update>
+	
+	<!-- 注意，以下SQL语句为MySQL，如果采用其他数据库，可能要改写SQL -->
+	<update id="updateBatch" parameterType="java.util.List">
+		replace into  sys_dict 
+				(
+			`dict_id`, 					`dict_name`, 					`dict_code`, 					`description`, 					`del_flag`, 					`create_by`, 					`create_time`, 					`update_by`, 					`update_time`				) 
+   		values 
+	 <foreach collection="list" item="item" index="index"
+			separator=","> 
+	    (
+	    	       #{item.dictId}, 	    	       #{item.dictName}, 	    	       #{item.dictCode}, 	    	       #{item.description}, 	    	       #{item.delFlag}, 	    	       #{item.createBy}, 	    	       #{item.createTime}, 	    	       #{item.updateBy}, 	    	       #{item.updateTime}	    	    )
+    </foreach> 
+	</update>	
+	
+	<delete id="delete">
+		delete from sys_dict where dict_id = #{value}
+	</delete>
+	
+	<delete id="deleteBatch">
+		delete from sys_dict where dict_id in 
+		<foreach item="dictId" collection="array" open="(" separator="," close=")">
+			#{dictId}
+		</foreach>
+	</delete>
+
+</mapper>

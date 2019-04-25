@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<artifactId>toceansoft-audio-service</artifactId>
+	<packaging>jar</packaging>
+	<description>Toceansoft Audio Service</description>
+
+	<parent>
+		<groupId>com.toceansoft</groupId>
+		<artifactId>toceansoft-base</artifactId>
+		<version>1.0.0.RELEASE</version>
+	</parent>
+
+	<properties>
+		<framework.version>1.0.0.RELEASE</framework.version>
+	</properties>
+
+	<dependencies>
+		<!-- 支持标注方式缓存 -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-cache</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.toceansoft</groupId>
+			<artifactId>toceansoft-common</artifactId>
+			<version>${framework.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.toceansoft</groupId>
+			<artifactId>toceansoft-framework-base</artifactId>
+			<version>${framework.version}</version>
+		</dependency>
+
+
+	</dependencies>
+
+	<!-- build> <finalName>${artifactId}</finalName> <plugins> <plugin> <groupId>org.springframework.boot</groupId> 
+		<artifactId>spring-boot-maven-plugin</artifactId> <configuration> <fork>true</fork> 
+		<mainClass>com.toceansoft.Application</mainClass> </configuration> <executions> 
+		<execution> <goals> <goal>repackage</goal> </goals> </execution> </executions> 
+		</plugin -->
+	<!-- 跳过单元测试 -->
+	<!-- plugin> <groupId>org.apache.maven.plugins</groupId> <artifactId>maven-surefire-plugin</artifactId> 
+		<configuration> <skipTests>true</skipTests> </configuration> </plugin> </plugins> 
+		</build -->
+
+	<repositories>
+		<repository>
+			<id>public</id>
+			<name>tocean nexus</name>
+			<url>http://nexus.toceansoft.com/repository/toceansoft/</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+		</repository>
+	</repositories>
+	<pluginRepositories>
+		<pluginRepository>
+			<id>public</id>
+			<name>tocean nexus</name>
+			<url>http://nexus.toceansoft.com/repository/toceansoft/</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</pluginRepository>
+	</pluginRepositories>
+
+</project>

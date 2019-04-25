@@ -1,0 +1,369 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.toceansoft.common.sociallogin.dao.SysQqUserDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+	<resultMap type="com.toceansoft.common.sociallogin.entity.SysQqUserEntity"
+		id="sysQqUserMap">
+		<result property="qqUserId" column="qq_user_id" />
+		<result property="figureurl2" column="figureurl_2" />
+		<result property="figureurl1" column="figureurl_1" />
+		<result property="figureurl" column="figureurl" />
+		<result property="nickname" column="nickname" />
+		<result property="figureurlQq1" column="figureurl_qq_1" />
+		<result property="figureurlQq2" column="figureurl_qq_2" />
+		<result property="gender" column="gender" />
+		<result property="isYellowVip" column="is_yellow_vip" />
+		<result property="vip" column="vip" />
+		<result property="yellowVipLevel" column="yellow_vip_level" />
+		<result property="level" column="level" />
+		<result property="isYellowYearVip" column="is_yellow_year_vip" />
+		<result property="openid" column="openid" />
+	</resultMap>
+	<!--动态查询条件 -->
+	<sql id="Dynamic_Where_Clause">
+		<if test="criteriaList != null">
+			<foreach collection="criteriaList" item="criteria" index="index0">
+				<trim prefix="(" suffix=")">
+					<foreach collection="criteria.criteria" item="criterion"
+						index="index">
+						<choose>
+							<when test="criterion.noValue">
+								${criterion.condition}
+							</when>
+							<when test="criterion.singleValue">
+								${criterion.condition} #{criterion.value}
+							</when>
+							<when test="criterion.betweenValue">
+								${criterion.condition} #{criterion.value} AND
+								#{criterion.secondValue}
+							</when>
+							<when test="criterion.listValue">
+								${criterion.condition}
+								<foreach collection="criterion.value" item="listItem"
+									open="(" close=")" separator=",">
+									#{listItem}
+								</foreach>
+							</when>
+						</choose>
+						<if test="index != criteria.criteria.size-1"> ${criterion.conditionRelationship} </if>
+					</foreach>
+				</trim>
+				<if test="index0 != criteriaList.size-1"> ${criteria.conditionRelationship} </if>
+			</foreach>
+		</if>
+	</sql>
+
+	<sql id="orderBy_case">
+		ORDER BY
+		<choose>
+			<when test="orderByList !=null">
+				<foreach collection="orderByList" item="orderBy" separator=",">
+					${orderBy.condition} ${orderBy.direction}
+				</foreach>
+			</when>
+			<otherwise>
+				qq_user_id desc
+			</otherwise>
+		</choose>
+	</sql>
+
+	<select id="queryObject"
+		resultType="com.toceansoft.common.sociallogin.entity.SysQqUserEntity">
+		select * from sys_qq_user where qq_user_id = #{value}
+	</select>
+	<select id="queryByOpenid"
+		resultType="com.toceansoft.common.sociallogin.entity.SysQqUserEntity">
+		select * from sys_qq_user where openid = #{value}
+	</select>
+
+	<!--Mybatis 中$与#的区别 -->
+	<!--#是将传入的值当做字符串的形式, 使用#可以很大程度上防止sql注入 -->
+	<!--$是将传入的数据直接显示生成sql语句,但是如果使用在order by 中就需要使用 $ -->
+	<select id="queryList"
+		resultType="com.toceansoft.common.sociallogin.entity.SysQqUserEntity">
+		select * from sys_qq_user
+		<choose>
+			<when test="sidx != null and sidx.trim() != ''">
+				order by ${sidx} ${order}
+			</when>
+			<otherwise>
+				order by qq_user_id desc
+			</otherwise>
+		</choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+
+	<select id="queryListByConditionUgly"
+		resultType="com.toceansoft.common.sociallogin.entity.SysQqUserEntity">
+		select * from sys_qq_user
+		<where>
+			<if test="qq_user_id != null">
+				`qq_user_id` = #{qq_user_id} and
+			</if>
+			<if test="figureurl_2 != null">
+				`figureurl_2` = #{figureurl_2} and
+			</if>
+			<if test="figureurl_1 != null">
+				`figureurl_1` = #{figureurl_1} and
+			</if>
+			<if test="figureurl != null">
+				`figureurl` = #{figureurl} and
+			</if>
+			<if test="nickname != null">
+				`nickname` = #{nickname} and
+			</if>
+			<if test="figureurl_qq_1 != null">
+				`figureurl_qq_1` = #{figureurl_qq_1} and
+			</if>
+			<if test="figureurl_qq_2 != null">
+				`figureurl_qq_2` = #{figureurl_qq_2} and
+			</if>
+			<if test="gender != null">
+				`gender` = #{gender} and
+			</if>
+			<if test="is_yellow_vip != null">
+				`is_yellow_vip` = #{is_yellow_vip} and
+			</if>
+			<if test="vip != null">
+				`vip` = #{vip} and
+			</if>
+			<if test="yellow_vip_level != null">
+				`yellow_vip_level` = #{yellow_vip_level} and
+			</if>
+			<if test="level != null">
+				`level` = #{level} and
+			</if>
+			<if test="is_yellow_year_vip != null">
+				`is_yellow_year_vip` = #{is_yellow_year_vip} and
+			</if>
+			<if test="openid != null">
+				`openid` = #{openid} and
+			</if>
+			1=1
+		</where>
+		<choose>
+			<when test="sidx != null and sidx.trim() != ''">
+				order by ${sidx} ${order}
+			</when>
+			<otherwise>
+				order by qq_user_id desc
+			</otherwise>
+		</choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	<select id="queryListByCondition"
+		resultType="com.toceansoft.common.sociallogin.entity.SysQqUserEntity">
+		select
+		<if test="distinct == true">distinct</if>
+		* from sys_qq_user
+		<where>
+			<include refid="Dynamic_Where_Clause" />
+		</where>
+		<include refid="orderBy_case" />
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+
+	<select id="queryTotal" resultType="int">
+		select count(*) from
+		sys_qq_user
+	</select>
+	<select id="queryTotalByConditionUgly" resultType="int">
+		select count(*) from sys_qq_user
+		<where>
+			<if test="qq_user_id != null">
+				`qq_user_id` = #{qq_user_id} and
+			</if>
+			<if test="figureurl_2 != null">
+				`figureurl_2` = #{figureurl_2} and
+			</if>
+			<if test="figureurl_1 != null">
+				`figureurl_1` = #{figureurl_1} and
+			</if>
+			<if test="figureurl != null">
+				`figureurl` = #{figureurl} and
+			</if>
+			<if test="nickname != null">
+				`nickname` = #{nickname} and
+			</if>
+			<if test="figureurl_qq_1 != null">
+				`figureurl_qq_1` = #{figureurl_qq_1} and
+			</if>
+			<if test="figureurl_qq_2 != null">
+				`figureurl_qq_2` = #{figureurl_qq_2} and
+			</if>
+			<if test="gender != null">
+				`gender` = #{gender} and
+			</if>
+			<if test="is_yellow_vip != null">
+				`is_yellow_vip` = #{is_yellow_vip} and
+			</if>
+			<if test="vip != null">
+				`vip` = #{vip} and
+			</if>
+			<if test="yellow_vip_level != null">
+				`yellow_vip_level` = #{yellow_vip_level} and
+			</if>
+			<if test="level != null">
+				`level` = #{level} and
+			</if>
+			<if test="is_yellow_year_vip != null">
+				`is_yellow_year_vip` = #{is_yellow_year_vip} and
+			</if>
+			<if test="openid != null">
+				`openid` = #{openid} and
+			</if>
+			1=1
+		</where>
+	</select>
+	<select id="queryTotalByCondition" resultType="int">
+		select count(*) from sys_qq_user
+		<where>
+			<include refid="Dynamic_Where_Clause" />
+		</where>
+	</select>
+
+	<insert id="save"
+		parameterType="com.toceansoft.common.sociallogin.entity.SysQqUserEntity"
+		useGeneratedKeys="true" keyProperty="qqUserId">
+		insert into sys_qq_user
+		(
+		`figureurl_2`,
+		`figureurl_1`,
+		`figureurl`,
+		`nickname`,
+		`figureurl_qq_1`,
+		`figureurl_qq_2`,
+		`gender`,
+		`is_yellow_vip`,
+		`vip`,
+		`yellow_vip_level`,
+		`level`,
+		`is_yellow_year_vip`,
+		`openid`
+		)
+		values
+		(
+		#{figureurl2},
+		#{figureurl1},
+		#{figureurl},
+		#{nickname},
+		#{figureurlQq1},
+		#{figureurlQq2},
+		#{gender},
+		#{isYellowVip},
+		#{vip},
+		#{yellowVipLevel},
+		#{level},
+		#{isYellowYearVip},
+		#{openid}
+		)
+	</insert>
+	<insert id="saveBatch" parameterType="java.util.List"
+		useGeneratedKeys="true" keyProperty="qqUserId">
+		insert into sys_qq_user
+		(
+		`figureurl_2`,
+		`figureurl_1`,
+		`figureurl`,
+		`nickname`,
+		`figureurl_qq_1`,
+		`figureurl_qq_2`,
+		`gender`,
+		`is_yellow_vip`,
+		`vip`,
+		`yellow_vip_level`,
+		`level`,
+		`is_yellow_year_vip`,
+		`openid`
+		)
+		values
+		<foreach collection="list" item="item" index="index"
+			separator=",">
+			(
+			#{item.figureurl2},
+			#{item.figureurl1},
+			#{item.figureurl},
+			#{item.nickname},
+			#{item.figureurlQq1},
+			#{item.figureurlQq2},
+			#{item.gender},
+			#{item.isYellowVip},
+			#{item.vip},
+			#{item.yellowVipLevel},
+			#{item.level},
+			#{item.isYellowYearVip},
+			#{openid}
+			)
+		</foreach>
+	</insert>
+
+	<update id="update"
+		parameterType="com.toceansoft.common.sociallogin.entity.SysQqUserEntity">
+		<foreach collection="list" item="item" index="index" open=""
+			close="" separator=";">
+			update sys_qq_user
+			<set>
+				<if test="figureurl2 != null">`figureurl_2` = #{item.figureurl2}, </if>
+				<if test="figureurl1 != null">`figureurl_1` = #{item.figureurl1}, </if>
+				<if test="figureurl != null">`figureurl` = #{item.figureurl}, </if>
+				<if test="nickname != null">`nickname` = #{item.nickname}, </if>
+				<if test="figureurlQq1 != null">`figureurl_qq_1` = #{item.figureurlQq1}, </if>
+				<if test="figureurlQq2 != null">`figureurl_qq_2` = #{item.figureurlQq2}, </if>
+				<if test="gender != null">`gender` = #{item.gender}, </if>
+				<if test="isYellowVip != null">`is_yellow_vip` = #{item.isYellowVip}, </if>
+				<if test="vip != null">`vip` = #{item.vip}, </if>
+				<if test="yellowVipLevel != null">`yellow_vip_level` = #{item.yellowVipLevel}, </if>
+				<if test="level != null">`level` = #{item.level}, </if>
+				<if test="isYellowYearVip != null">`is_yellow_year_vip` = #{item.isYellowYearVip},</if>
+				<if test="openid != null">`openid` = #{item.openid}</if>
+			</set>
+			where qq_user_id = #{item.qqUserId}
+		</foreach>
+	</update>
+
+	<!-- 注意，以下SQL语句为MySQL，如果采用其他数据库，可能要改写SQL -->
+	<update id="updateBatch" parameterType="java.util.List">
+		replace into sys_qq_user
+		(
+		`qq_user_id`, `figureurl_2`, `figureurl_1`,
+		`figureurl`, `nickname`,
+		`figureurl_qq_1`, `figureurl_qq_2`, `gender`,
+		`is_yellow_vip`, `vip`,
+		`yellow_vip_level`, `level`,
+		`is_yellow_year_vip`,`openid` )
+		values
+		<foreach collection="list" item="item" index="index"
+			separator=",">
+			(
+			#{item.qqUserId}, #{item.figureurl2}, #{item.figureurl1},
+			#{item.figureurl},
+			#{item.nickname}, #{item.figureurlQq1},
+			#{item.figureurlQq2},
+			#{item.gender}, #{item.isYellowVip},
+			#{item.vip},
+			#{item.yellowVipLevel}, #{item.level},
+			#{item.isYellowYearVip},#{openid} )
+		</foreach>
+	</update>
+
+	<delete id="delete">
+		delete from sys_qq_user where qq_user_id = #{value}
+	</delete>
+
+	<delete id="deleteBatch">
+		delete from sys_qq_user where qq_user_id in
+		<foreach item="qqUserId" collection="array" open="("
+			separator="," close=")">
+			#{qqUserId}
+		</foreach>
+	</delete>
+
+</mapper>

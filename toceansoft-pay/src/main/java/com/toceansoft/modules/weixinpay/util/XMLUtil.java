@@ -1,0 +1,202 @@
+/*  
+ * Copyright 2010-2017 Tocean Group.  
+ * 版权：商业代码，未经许可，禁止任何形式拷贝、传播及使用
+ * 文件名：XMLUtil.java
+ * 描述：  
+ * 修改人： Narci.Lee  
+ * 修改时间：2017年11月22日  
+ * 跟踪单号：  
+ * 修改单号：  
+ * 修改内容：  
+ */
+package com.toceansoft.modules.weixinpay.util;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.jdom.Document;
+import org.jdom.Element;
+import org.jdom.JDOMException;
+import org.jdom.input.SAXBuilder;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
+
+import com.toceansoft.common.exception.RRException;
+
+import lombok.extern.slf4j.Slf4j;
+
+/**
+ * XML解析 创建者 拓胜科技 创建时间 2017年7月31日
+ *
+ */
+@Slf4j
+public class XMLUtil {
+	/**
+	 * 解析xml,返回第一级元素键值对。如果第一级元素有子节点，则此节点的值是子节点的xml数据。
+	 * 
+	 * @param strxml
+	 *            String
+	 * @return Map
+	 * @throws JDOMException
+	 *             je
+	 * @throws IOException
+	 *             ie
+	 */
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public static Map doXMLParse(String strxml) throws JDOMException, IOException {
+		// 过滤关键词，防止XXE漏洞攻击
+		strxml = filterXXE(strxml);
+		strxml = strxml.replaceFirst("encoding=\".*\"", "encoding=\"UTF-8\"");
+
+		if ("".equals(strxml)) {
+			return null;
+		}
+
+		Map m = new HashMap();
+
+		InputStream in = new ByteArrayInputStream(strxml.getBytes("UTF-8"));
+		SAXBuilder builder = new SAXBuilder();
+		Document doc = builder.build(in);
+		Element root = doc.getRootElement();
+		List list = root.getChildren();
+		Iterator it = list.iterator();
+		while (it.hasNext()) {
+			Element e = (Element) it.next();
+			String k = e.getName();
+			String v = "";
+			List children = e.getChildren();
+			if (children.isEmpty()) {
+				v = e.getTextNormalize();
+			} else {
+				v = XMLUtil.getChildrenText(children);
+			}
+
+			m.put(k, v);
+		}
+
+		// 关闭流
+		in.close();
+
+		return m;
+	}
+
+	/**
+	 * 获取子结点的xml
+	 * 
+	 * @param children
+	 *            List
+	 * @return String
+	 */
+	@SuppressWarnings({ "rawtypes" })
+	public static String getChildrenText(List children) {
+		StringBuffer sb = new StringBuffer();
+		if (!children.isEmpty()) {
+			Iterator it = children.iterator();
+			while (it.hasNext()) {
+				Element e = (Element) it.next();
+				String name = e.getName();
+				String value = e.getTextNormalize();
+				List list = e.getChildren();
+				sb.append("<" + name + ">");
+				if (!list.isEmpty()) {
+					sb.append(XMLUtil.getChildrenText(list));
+				}
+				sb.append(value);
+				sb.append("</" + name + ">");
+			}
+		}
+
+		return sb.toString();
+	}
+
+	/**
+	 * 通过DOCTYPE和ENTITY来加载本地受保护的文件、替换掉即可
+	 * 漏洞原理：https://my.oschina.net/u/574353/blog/1841103      * 防止 XXE漏洞 注入实体攻击    
+	 *  * 过滤 过滤用户提交的XML数据      * 过滤关键词：<!DOCTYPE和<!ENTITY，或者SYSTEM和PUBLIC。    
+	 * 
+	 * @param xmlStr
+	 *            String
+	 * @return String
+	 */
+	public static String filterXXE(String xmlStr) {
+		xmlStr = xmlStr.replace("DOCTYPE", "").replace("SYSTEM", "").replace("ENTITY", "")
+				.replace("PUBLIC", "");
+		return xmlStr;
+	}
+
+	/**
+	 * 微信给出的 XXE漏洞方案 https://pay.weixin.qq.com/wiki/doc/api/jsapi.php?chapter=23_5
+	 * 
+	 * @param strXML
+	 *            String
+	 * @return Map
+	 * 
+	 */
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public static Map doXMLParse2(String strXML) {
+		Map m = new HashMap<>();
+		DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+		String feature = null;
+		DocumentBuilder documentBuilder = null;
+		InputStream stream = null;
+		org.w3c.dom.Document doc = null;
+		try {
+			feature = "http://apache.org/xml/features/disallow-doctype-decl";
+			documentBuilderFactory.setFeature(feature, true);
+
+			feature = "http://xml.org/sax/features/external-general-entities";
+			documentBuilderFactory.setFeature(feature, false);
+
+			feature = "http://xml.org/sax/features/external-parameter-entities";
+			documentBuilderFactory.setFeature(feature, false);
+
+			feature = "http://apache.org/xml/features/nonvalidating/load-external-dtd";
+			documentBuilderFactory.setFeature(feature, false);
+
+			documentBuilderFactory.setXIncludeAware(false);
+			documentBuilderFactory.setExpandEntityReferences(false);
+
+			documentBuilder = documentBuilderFactory.newDocumentBuilder();
+			stream = new ByteArrayInputStream(strXML.getBytes("UTF-8"));
+			doc = documentBuilder.parse(stream);
+			doc.getDocumentElement().normalize();
+			NodeList nodeList = doc.getDocumentElement().getChildNodes();
+			for (int idx = 0; idx < nodeList.getLength(); ++idx) {
+				Node node = nodeList.item(idx);
+				if (node.getNodeType() == Node.ELEMENT_NODE) {
+					org.w3c.dom.Element element = (org.w3c.dom.Element) node;
+					m.put(element.getNodeName(), element.getTextContent());
+				}
+			}
+		} catch (ParserConfigurationException e) {
+			throw new RRException(e.getMessage(), e);
+		} catch (UnsupportedEncodingException e) {
+			throw new RRException(e.getMessage(), e);
+		} catch (SAXException e) {
+			throw new RRException(e.getMessage(), e);
+		} catch (IOException e) {
+			throw new RRException(e.getMessage(), e);
+		} finally {
+			try {
+				if (stream != null) {
+					stream.close();
+				}
+			} catch (IOException e) {
+				log.debug("关闭资源失败。");
+			}
+		}
+		return m;
+	}
+
+}

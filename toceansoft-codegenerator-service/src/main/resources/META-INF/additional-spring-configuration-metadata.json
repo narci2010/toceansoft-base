@@ -1,0 +1,112 @@
+{"properties": [
+  {
+    "name": "server.http.port",
+    "type": "java.lang.String",
+    "description": "A description for 'server.http.port'"
+  },
+  {
+    "name": "app.name-key",
+    "type": "java.lang.String",
+    "description": "A description for 'app.name-key'"
+  },
+  {
+    "name": "logging.level.*",
+    "type": "java.lang.String",
+    "description": "A description for 'logging.level.*'"
+  },
+  {
+    "name": "logging.level.com.toceansoft",
+    "type": "java.lang.String",
+    "description": "A description for 'logging.level.com.toceansoft'"
+  },
+  {
+    "name": "session.timeout",
+    "type": "java.lang.String",
+    "description": "A description for 'session.timeout'"
+  },
+  {
+    "name": "password.algorithm-name",
+    "type": "java.lang.String",
+    "description": "A description for 'password.algorithm-name'"
+  },
+  {
+    "name": "password.hash-iterations",
+    "type": "java.lang.String",
+    "description": "A description for 'password.hash-iterations'"
+  },
+  {
+    "name": "password.retry-delay-time",
+    "type": "java.lang.String",
+    "description": "A description for 'password.retry-delay-time'"
+  },
+  {
+    "name": "password.allowretry-times",
+    "type": "java.lang.String",
+    "description": "A description for 'password.allowretry-times'"
+  },
+  {
+    "name": "shiro.default.loginurl",
+    "type": "java.lang.String",
+    "description": "A description for 'shiro.default.loginurl'"
+  },
+  {
+    "name": "shiro.default.successurl",
+    "type": "java.lang.String",
+    "description": "A description for 'shiro.default.successurl'"
+  },
+  {
+    "name": "shiro.default.userparam",
+    "type": "java.lang.String",
+    "description": "A description for 'shiro.default.userparam'"
+  },
+  {
+    "name": "shiro.default.passwordparam",
+    "type": "java.lang.String",
+    "description": "A description for 'shiro.default.passwordparam'"
+  },
+  {
+    "name": "shiro.default.remembermeparam",
+    "type": "java.lang.String",
+    "description": "A description for 'shiro.default.remembermeparam'"
+  },
+  {
+    "name": "spring.datasource.druid.first.url",
+    "type": "java.lang.String",
+    "description": "A description for 'spring.datasource.druid.first.url'"
+  },
+  {
+    "name": "spring.datasource.druid.second.url",
+    "type": "java.lang.String",
+    "description": "A description for 'spring.datasource.druid.second.url'"
+  },
+  {
+    "name": "spring.datasource.druid.first.username",
+    "type": "java.lang.String",
+    "description": "A description for 'spring.datasource.druid.first.username'"
+  },
+  {
+    "name": "spring.datasource.druid.first.password",
+    "type": "java.lang.String",
+    "description": "A description for 'spring.datasource.druid.first.password'"
+  },
+  {
+    "name": "spring.datasource.druid.second.username",
+    "type": "java.lang.String",
+    "description": "A description for 'spring.datasource.druid.second.username'"
+  },
+  {
+    "name": "spring.datasource.druid.second.password",
+    "type": "java.lang.String",
+    "description": "A description for 'spring.datasource.druid.second.password'"
+  },
+  {
+    "name": "cors.allowedheaders",
+    "type": "java.lang.String",
+    "description": "A description for 'cors.allowedheaders'"
+  },
+  {
+    "name": "cors.allowedmethods",
+    "type": "java.lang.String",
+    "description": "A description for 'cors.allowedmethods'"
+  }
+]}

@@ -1,0 +1,65 @@
+.apt_generated/
+tocean/
+# Created by .gitignore support plugin (alan.yan)
+### maven ###
+target/
+.mvn
+mvnw.cmd
+mvnw
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+
+### NetBeans ###
+nbproject/private/
+build/
+nbbuild/
+dist/
+nbdist/
+.nb-gradle/
+
+*.jar
+*.war
+*~
+*.class
+*.lock
+*.DS_Store
+*.swp
+*.out
+.externalToolBuilders/
+.settings/
+.tern-project
+.metadata/
+.mine/
+logs/
+dev.properties
+dubbo.properties
+dev-admin.properties
+dependency-reduced-pom.xml
+*.rdb
+*.log
+*.gz
+*apidocs/
+*.versionsBackup
+flyway.properties
+_book/
+**/rebel.xml
+null/
+*.bak
+.checkstyle
+.pmd
+.pmdruleset.xml
+.gitattributes
+.fbExcludeFilterFile
+

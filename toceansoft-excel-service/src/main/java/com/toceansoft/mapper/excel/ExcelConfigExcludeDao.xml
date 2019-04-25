@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.toceansoft.common.excel.dao.ExcelConfigExcludeDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.toceansoft.common.excel.entity.ExcelConfigExcludeEntity" id="excelConfigExcludeMap">
+        <result property="excelConfigExcludeId" column="excel_config_exclude_id"/>
+        <result property="excelConfigId" column="excel_config_id"/>
+        <result property="excelConfigExcludeColumn" column="excel_config_exclude_column"/>
+    </resultMap>
+
+	<select id="queryObject" resultType="com.toceansoft.common.excel.entity.ExcelConfigExcludeEntity">
+		select * from excel_config_exclude where excel_config_exclude_id = #{value}
+	</select>
+
+	<select id="queryList" resultType="com.toceansoft.common.excel.entity.ExcelConfigExcludeEntity">
+		select * from excel_config_exclude
+        <choose>
+            <when test="sidx != null and sidx.trim() != ''">
+                order by ${sidx} ${order}
+            </when>
+			<otherwise>
+                order by excel_config_exclude_id desc
+			</otherwise>
+        </choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+ 	<select id="queryTotal" resultType="int">
+		select count(*) from excel_config_exclude 
+	</select>
+	 
+	<insert id="save" parameterType="com.toceansoft.common.excel.entity.ExcelConfigExcludeEntity" useGeneratedKeys="true" keyProperty="excelConfigExcludeId">
+		insert into excel_config_exclude
+		(
+			`excel_config_id`, 
+			`excel_config_exclude_column`
+		)
+		values
+		(
+			#{excelConfigId}, 
+			#{excelConfigExcludeColumn}
+		)
+	</insert>
+	 
+	<update id="update" parameterType="com.toceansoft.common.excel.entity.ExcelConfigExcludeEntity">
+		update excel_config_exclude 
+		<set>
+			<if test="excelConfigId != null">`excel_config_id` = #{excelConfigId}, </if>
+			<if test="excelConfigExcludeColumn != null">`excel_config_exclude_column` = #{excelConfigExcludeColumn}</if>
+		</set>
+		where excel_config_exclude_id = #{excelConfigExcludeId}
+	</update>
+	
+	<delete id="delete">
+		delete from excel_config_exclude where excel_config_exclude_id = #{value}
+	</delete>
+	
+	<delete id="deleteBatch">
+		delete from excel_config_exclude where excel_config_exclude_id in 
+		<foreach item="excelConfigExcludeId" collection="array" open="(" separator="," close=")">
+			#{excelConfigExcludeId}
+		</foreach>
+	</delete>
+
+	<delete id="deleteByExcelConfigId" >
+		delete from excel_config_exclude where excel_config_id = #{value}
+	</delete>
+</mapper>

@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.toceansoft.common.sociallogin.dao.SysWechatUsermetaDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.toceansoft.common.sociallogin.entity.SysWechatUsermetaEntity" id="sysWechatUsermetaMap">
+        <result property="metaId" column="meta_id"/>
+        <result property="wechatUserId" column="wechat_user_id"/>
+        <result property="metaKey" column="meta_key"/>
+        <result property="metaValue" column="meta_value"/>
+    </resultMap>
+        <!--动态查询条件-->   
+    	<sql id="Dynamic_Where_Clause">
+		<if test="criteriaList != null">
+			<foreach collection="criteriaList" item="criteria" index="index0">
+				<trim prefix="(" suffix=")">
+					<foreach collection="criteria.criteria" item="criterion"
+						index="index">
+						<choose>
+							<when test="criterion.noValue">
+								${criterion.condition}
+							</when>
+							<when test="criterion.singleValue">
+								${criterion.condition} #{criterion.value}
+							</when>
+							<when test="criterion.betweenValue">
+								${criterion.condition} #{criterion.value} AND
+								#{criterion.secondValue}
+							</when>
+							<when test="criterion.listValue">
+								${criterion.condition}
+								<foreach collection="criterion.value" item="listItem"
+									open="(" close=")" separator=",">
+									#{listItem}
+								</foreach>
+							</when>
+						</choose>
+						<if test="index != criteria.criteria.size-1"> ${criterion.conditionRelationship} </if>
+					</foreach>
+				</trim>
+				<if test="index0 != criteriaList.size-1"> ${criteria.conditionRelationship} </if>
+			</foreach>
+		</if>
+	</sql>
+
+	<sql id="orderBy_case">
+		ORDER BY 
+		<choose>
+			<when test="orderByList !=null">
+				<foreach collection="orderByList" item="orderBy" separator=",">
+					${orderBy.condition} ${orderBy.direction}
+				</foreach>
+			</when>
+			<otherwise>
+				meta_id desc
+			</otherwise>
+		</choose>
+	</sql>
+
+	<select id="queryObject" resultType="com.toceansoft.common.sociallogin.entity.SysWechatUsermetaEntity">
+		select * from sys_wechat_usermeta where meta_id = #{value}
+	</select>
+
+    <!--Mybatis 中$与#的区别 -->
+    <!--#是将传入的值当做字符串的形式, 使用#可以很大程度上防止sql注入 -->
+    <!--$是将传入的数据直接显示生成sql语句,但是如果使用在order by 中就需要使用 $ -->
+	<select id="queryList" resultType="com.toceansoft.common.sociallogin.entity.SysWechatUsermetaEntity">
+		select * from sys_wechat_usermeta
+        <choose>
+            <when test="sidx != null and sidx.trim() != ''">
+                order by ${sidx} ${order}
+            </when>
+			<otherwise>
+                order by meta_id desc
+			</otherwise>
+        </choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+	<select id="queryListByConditionUgly" resultType="com.toceansoft.common.sociallogin.entity.SysWechatUsermetaEntity">
+		select * from sys_wechat_usermeta
+		<where>
+    			    	   <if test="meta_id != null">
+		    	`meta_id` = #{meta_id} and 		       </if>
+            	    	   <if test="wechat_user_id != null">
+		    	`wechat_user_id` = #{wechat_user_id} and 		       </if>
+            	    	   <if test="meta_key != null">
+		    	`meta_key` = #{meta_key} and 		       </if>
+            	    	   <if test="meta_value != null">
+		    	`meta_value` = #{meta_value} 		       </if>
+            		</where>
+        <choose>
+            <when test="sidx != null and sidx.trim() != ''">
+                order by ${sidx} ${order}
+            </when>
+			<otherwise>
+                order by meta_id desc
+			</otherwise>
+        </choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	<select id="queryListByCondition" resultType="com.toceansoft.common.sociallogin.entity.SysWechatUsermetaEntity">
+		select 
+		<if test="distinct == true">distinct</if> 
+		* from sys_wechat_usermeta
+		<where>
+			<include refid="Dynamic_Where_Clause" />
+		</where>
+		<include refid="orderBy_case" />
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+ 	<select id="queryTotal" resultType="int">
+		select count(*) from sys_wechat_usermeta 
+	</select>
+	<select id="queryTotalByConditionUgly" resultType="int">
+		select count(*) from sys_wechat_usermeta 
+		<where>
+    			    	   <if test="meta_id != null">
+		    	`meta_id` = #{meta_id} and 		       </if>
+            	    	   <if test="wechat_user_id != null">
+		    	`wechat_user_id` = #{wechat_user_id} and 		       </if>
+            	    	   <if test="meta_key != null">
+		    	`meta_key` = #{meta_key} and 		       </if>
+            	    	   <if test="meta_value != null">
+		    	`meta_value` = #{meta_value} 		       </if>
+            		</where>
+	</select>
+		<select id="queryTotalByCondition" resultType="int">
+		select count(*) from sys_wechat_usermeta 
+		<where>
+			<include refid="Dynamic_Where_Clause" />
+		</where>
+	</select>
+	 
+	<insert id="save" parameterType="com.toceansoft.common.sociallogin.entity.SysWechatUsermetaEntity" useGeneratedKeys="true" keyProperty="metaId">
+		insert into sys_wechat_usermeta
+		(
+			`wechat_user_id`, 
+			`meta_key`, 
+			`meta_value`
+		)
+		values
+		(
+			#{wechatUserId}, 
+			#{metaKey}, 
+			#{metaValue}
+		)
+	</insert>
+	<insert id="saveBatch" parameterType="java.util.List" useGeneratedKeys="true" keyProperty="metaId">
+		insert into sys_wechat_usermeta
+		(
+			`wechat_user_id`, 
+			`meta_key`, 
+			`meta_value`
+		)
+		values
+        <foreach collection="list" item="item" index="index" separator=",">		
+		(
+			#{item.wechatUserId}, 
+			#{item.metaKey}, 
+			#{item.metaValue}
+		)
+      </foreach>		
+	</insert>	
+	 
+	<update id="update" parameterType="com.toceansoft.common.sociallogin.entity.SysWechatUsermetaEntity">
+	  <foreach collection="list" item="item" index="index" open="" close="" separator=";">
+		update sys_wechat_usermeta 
+		<set>
+			<if test="wechatUserId != null">`wechat_user_id` = #{item.wechatUserId}, </if>
+			<if test="metaKey != null">`meta_key` = #{item.metaKey}, </if>
+			<if test="metaValue != null">`meta_value` = #{item.metaValue}</if>
+		</set>
+		where meta_id = #{item.metaId}
+	  </foreach>  	
+	</update>
+	
+	<!-- 注意，以下SQL语句为MySQL，如果采用其他数据库，可能要改写SQL -->
+	<update id="updateBatch" parameterType="java.util.List">
+		replace into  sys_wechat_usermeta 
+				(
+			`meta_id`, 					`wechat_user_id`, 					`meta_key`, 					`meta_value`				) 
+   		values 
+	 <foreach collection="list" item="item" index="index"
+			separator=","> 
+	    (
+	    	       #{item.metaId}, 	    	       #{item.wechatUserId}, 	    	       #{item.metaKey}, 	    	       #{item.metaValue}	    	    )
+    </foreach> 
+	</update>	
+	
+	<delete id="delete">
+		delete from sys_wechat_usermeta where meta_id = #{value}
+	</delete>
+	
+	<delete id="deleteBatch">
+		delete from sys_wechat_usermeta where meta_id in 
+		<foreach item="metaId" collection="array" open="(" separator="," close=")">
+			#{metaId}
+		</foreach>
+	</delete>
+
+</mapper>
