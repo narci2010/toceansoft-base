@@ -64,6 +64,23 @@ public class TableEntityImpl implements TableEntityDao {
   }
 
   /**
+   * @param tableName 获取表主键
+   * @return 表结构集合
+   */
+  public TableEntity getTableInfoByPrimary(String tableName) {
+    //约定主键为自增长 同时表的结构中 主键id为1
+    String table = sqlProcessingUtil.formatString(tableName);
+    String schema = this.getDatabaseName(datasourceFirstUrl);
+    String sql =
+            "SELECT COLUMN_NAME,ORDINAL_POSITION,IS_NULLABLE,DATA_TYPE,CHARACTER_MAXIMUM_LENGTH,"
+                    + "COLUMN_KEY,COLUMN_COMMENT FROM COLUMNS WHERE TABLE_SCHEMA = '" + schema
+                    + "' AND TABLE_NAME = " + table + " "
+                    + "AND COLUMN_KEY = 'PRI' ";
+    List<TableEntity> objectsList = jdbcTemplate.query(sql, new TableEntityRowMapper());
+    return objectsList.get(0);
+  }
+
+  /**
    *
    * @param tableName  表名
    * @param tableEntityList  表结构
@@ -78,9 +95,9 @@ public class TableEntityImpl implements TableEntityDao {
     for (TableEntity tmp : tableEntityList) {
          //当最后一个时需要特殊处理
       if (tableEntityList.size() - 1 == i) {
-        sql.append(tmp.getName() + ") VALUES ");
+        sql.append("`" + tmp.getName() + "`) VALUES ");
       } else {
-        sql .append(tmp.getName() + ",");
+        sql .append("`" + tmp.getName() + "`,");
       }
       i++;
     }
@@ -176,22 +193,28 @@ public class TableEntityImpl implements TableEntityDao {
    *
    * @param tableName 表名
    * @param table  表结构
+   * @param id  主键
+   * @param idVal 主键值
    * @return  表数据信息
    */
-  public List<Map<String, Object>> getTableInfo(String tableName, List<TableEntity> table) {
+  public Map<String, Object> getTableInfo(String tableName, List<TableEntity> table,
+                                                String id, long idVal) {
     StringBuffer buffer = new StringBuffer("SELECT ");
     int index = 0;
     for (TableEntity tmp: table) {
       if (table.size() - 1 == index) {
-        buffer.append(tmp.getName());
+        buffer.append("`" + tmp.getName() + "`");
       } else {
-        buffer.append(tmp.getName() + ",");
+        buffer.append("`" + tmp.getName() + "`,");
       }
       index++;
     }
     buffer.append(" from " + tableName);
+    if (id != null && !id.equals("")) {
+      buffer.append(" where " + id + " = " + idVal);
+    }
     log.info("sql: " + buffer.toString());
-    List<Map<String, Object>> objectList = firstJdbcTemplate.queryForList(buffer.toString());
+    Map<String, Object> objectList = firstJdbcTemplate.queryForMap(buffer.toString()); //.queryForList(buffer.toString())
     return objectList;
   }
 

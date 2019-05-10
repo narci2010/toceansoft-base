@@ -16,6 +16,8 @@ import java.util.Map;
 
 import org.apache.ibatis.annotations.Mapper;
 
+import com.toceansoft.codegenerator.entity.ColumnEntityVo;
+
 /**
  * 
  * @author Narci.Lee
@@ -26,8 +28,7 @@ public interface SysGeneratorDao {
 
 	/**
 	 * 
-	 * @param map
-	 *            Map<String, Object>
+	 * @param map Map<String, Object>
 	 * @return Map<String, Object>
 	 */
 	// @DataSource(name = "tocean_1")
@@ -35,8 +36,7 @@ public interface SysGeneratorDao {
 
 	/**
 	 * 
-	 * @param map
-	 *            Map<String, Object>
+	 * @param map Map<String, Object>
 	 * @return int
 	 */
 	// @DataSource(name = "tocean_1")
@@ -44,8 +44,7 @@ public interface SysGeneratorDao {
 
 	/**
 	 * 
-	 * @param tableName
-	 *            String
+	 * @param tableName String
 	 * @return Map<String, String>
 	 */
 	// @DataSource(name = "tocean_1")
@@ -53,10 +52,23 @@ public interface SysGeneratorDao {
 
 	/**
 	 * 
-	 * @param tableName
-	 *            String
+	 * @param tableName String
 	 * @return List<Map<String, String>>
 	 */
 	// @DataSource(name = "tocean_1")
 	List<Map<String, String>> queryColumns(String tableName);
+	/**
+	 * 
+	 * @param tableName String
+	 * @return List<ColumnEntityVo>
+	 */
+	// @DataSource(name = "tocean_1")
+	List<ColumnEntityVo> queryColumnsMany(String tableName);
+
+	/**
+	 * 
+	 * @return List<String>
+	 */
+	// @DataSource(name = "tocean_1")
+	List<String> queryTables();
 }

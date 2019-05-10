@@ -43,14 +43,23 @@ public interface TableEntityService {
    *
    * @param tableName 表名
    * @param table  表结构
+   * @param id 主键
+   * @param idVal 主键值
    * @return  表数据信息
    */
-  List<Map<String, Object>> getTableInfo(String tableName, List<TableEntity> table);
+  Map<String, Object> getTableInfo(String tableName, List<TableEntity> table, String id, long idVal);
 
   /**
    * 获取数据池1 数据库中的所有表名
    * @return  表名集合
    */
   List<Map<String, Object>> getTableNameList();
+
+  /**
+   * 获取表主键
+   * @param tableName 表名
+   * @return TableEntity
+   */
+  TableEntity getTableInfoByPrimary(String tableName);
 
 }

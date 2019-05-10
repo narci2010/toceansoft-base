@@ -27,6 +27,14 @@ public interface TableEntityDao {
    */
    List<TableEntity> getTableInfo(String tableName);
 
+
+    /**
+     *  获取主键
+     * @param tableName 表名
+     * @return 表结构集合
+     */
+    TableEntity getTableInfoByPrimary(String tableName);
+
   /**
    *
    * @param tableName  表名
@@ -40,9 +48,11 @@ public interface TableEntityDao {
    *
    * @param tableName 表名
    * @param table  表结构
+   * @param id  主键
+   * @param idVal 主键值
    * @return  表数据信息
    */
-   List<Map<String, Object>> getTableInfo(String tableName, List<TableEntity> table);
+  Map<String, Object> getTableInfo(String tableName, List<TableEntity> table, String id, long idVal);
 
   /**
    * 获取数据池1 数据库中的所有表名

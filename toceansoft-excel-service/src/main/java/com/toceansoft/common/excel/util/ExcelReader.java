@@ -15,18 +15,19 @@ import com.toceansoft.common.excel.entity.TableEntity;
 import com.toceansoft.common.exception.RRException;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
+import java.util.ArrayList;
 import java.util.Map;
+import java.util.HashMap;
 import java.util.Set;
+import java.util.Locale;
+import java.util.Date;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.ss.util.CellRangeAddress;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
@@ -47,13 +48,14 @@ public final class ExcelReader {
    *
    * @param row 行
    * @param tableEntity excel数据
+   * @param num 下标
    * @return 值
    */
-  public String getCellValue(Row row, TableEntity tableEntity) {
+  public String getCellValue(Row row, TableEntity tableEntity, int num) {
     // 校验单元格
-    this.validationCell(row, tableEntity);
+    this.validationCell(row, tableEntity, num);
     // 获取单元格
-    Cell cell = row.getCell(tableEntity.getOrder() - 2);
+    Cell cell = row.getCell(num); // tableEntity.getOrder() - 2
 
     // 为空则返回空
     if (cell == null || CellType.BLANK.equals(cell.getCellTypeEnum())) {
@@ -68,11 +70,12 @@ public final class ExcelReader {
    *
    * @param row 行
    * @param tableEntity excel数据
+   * @param num 下标
    */
-  public void validationCell(Row row, TableEntity tableEntity) {
+  public void validationCell(Row row, TableEntity tableEntity, int num) {
     String messageTotal = "";
     // 获取单元格
-    Cell cell = row.getCell(tableEntity.getOrder() - 2);
+    Cell cell = row.getCell(num); // tableEntity.getOrder() - 2
     if (tableEntity.isRequire()) {
       // 单元格为空
       if (cell == null || cell.getCellTypeEnum().equals(CellType.BLANK)
@@ -136,17 +139,18 @@ public final class ExcelReader {
    *        不添加入表的字段信息
    * @return 列表
    */
-  public List<Map<String, String>> readeBySheet(Sheet sheet, List<TableEntity> tableEntityList, int num,  List<TableEntity> excludeList) {
+  public List<Map<String, String>> readeBySheet(Sheet sheet, Map<List<TableEntity>, Map<Integer, Integer>> tableEntityList,
+               int num,  List<TableEntity> excludeList) {
     // 校验工作表
     this.validationSheet(sheet, tableEntityList, num, excludeList);
 
     // 声明实例返回列表
     List<Map<String, String>> result = new ArrayList<>();
 
-    for (int i = 2; i <= sheet.getLastRowNum(); i++) {
+    for (int i = 3; i <= sheet.getLastRowNum(); i++) {
       Row row = sheet.getRow(i);
       if (row != null) {
-        result.add(this.rowToObject(row, tableEntityList));
+        result.add(this.rowToObject(row, tableEntityList, excludeList)); // TODO: bug
       }
     }
     return result;
@@ -162,18 +166,32 @@ public final class ExcelReader {
    *
    * @param row 行
    * @param tableEntityList 表机构
+   * @param excludeList 不导入字段
    * @return 对象
    */
-  public Map<String, String> rowToObject(Row row, List<TableEntity> tableEntityList) {
+  public Map<String, String> rowToObject(Row row, Map<List<TableEntity>, Map<Integer, Integer>> tableEntityList,
+                                         List<TableEntity> excludeList) {
     Map<String, String> map = new HashMap<>();
     String tmp = "";
-    for (int i = 0; i < tableEntityList.size(); i++) {
-       tmp = this.getCellValue(row, tableEntityList.get(i));
-       if (tmp != null && StringUtils.isEmpty(tmp)) {
-         tmp = tmp.trim();
-       }
-     map.put(tableEntityList.get(i).getName(), tmp);
+    for (Map.Entry<List<TableEntity>, Map<Integer, Integer>> data: tableEntityList.entrySet()) {
+      for (Map.Entry<Integer, Integer> num: data.getValue().entrySet()) {
+        int[] i = {num.getKey()};
+        for (TableEntity tab: data.getKey()) {
+          excludeList.forEach((entity) -> {
+            if ((tab.getOrder() - entity.getOrder()) == 1) {
+              i[0]++;
+              return;
+            }
+          });
+          tmp = this.getCellValue(row, tab, i[0]++);
+          if (tmp != null && StringUtils.isEmpty(tmp)) {
+            tmp = tmp.trim();
+          }
+          map.put(tab.getName(), tmp);
+        }
+      }
     }
+
    return map;
   }
 
@@ -185,42 +203,84 @@ public final class ExcelReader {
    * @param  num 不添加入表的字段
    * @param  excludeList  过滤出的字段
    */
-  public void validationSheet(Sheet sheet, List<TableEntity> tableEntityList, int num, List<TableEntity> excludeList) {
+  public void validationSheet(Sheet sheet, Map<List<TableEntity>, Map<Integer, Integer>> tableEntityList,
+                              int num, List<TableEntity> excludeList) {
 
     // 错误信息
     final String errorMessage = "表头数据不匹配，请下载使用最新模板。";
     if (sheet == null || sheet.getLastRowNum() < 1) {
       throw new RRException(errorMessage);
     }
-    // sheet字段数与系统不符
-    Row row = sheet.getRow(1);
-    if ((tableEntityList.size() + num) != row.getLastCellNum()) {
-      throw new RRException(errorMessage);
-    }
 
-    // 表格字段与系统不符
-    int i = 0;
-    for (TableEntity data : tableEntityList) {
-      Cell cell = row.getCell(i++);
-      String[] strings = cell.getStringCellValue().split("_");
-       if (num != 0) {
-         for (TableEntity tableEntity : excludeList) {
-           if (tableEntity.getComment().equals(strings[0].trim())) {
-              cell = row.getCell(i++);
-             strings = cell.getStringCellValue().split("_");
-           }
-         }
-       }
-      if (!data.getComment().trim().equals(strings[0].trim())) {
-        throw new RRException(errorMessage);
+    // sheet字段数与系统不符
+    Row row = sheet.getRow(2);
+    for (Map.Entry<List<TableEntity>, Map<Integer, Integer>> tmp: tableEntityList.entrySet()) {
+      for (Map.Entry<Integer, Integer> numbers: tmp.getValue().entrySet()) {
+        if ((tmp.getKey().size() + num) != ((numbers.getValue() - numbers.getKey()) + 1)) {
+          throw new RRException(errorMessage);
+        }
       }
     }
+
+
+    // 表格字段与系统不符
+    int[] i = {0};
+    for (Map.Entry<List<TableEntity>, Map<Integer, Integer>> data: tableEntityList.entrySet()) {
+      for (Map.Entry<Integer, Integer> number: data.getValue().entrySet()) {
+        i[0] = number.getKey();
+        data.getKey().forEach((tmp) -> {
+          Cell cell = row.getCell(i[0]++);
+          String[] strings = cell.getStringCellValue().split("_");
+          if (num != 0) {
+            for (TableEntity tableEntity : excludeList) {
+              if (tableEntity.getComment().equals(strings[0].trim())) {
+                cell = row.getCell(i[0]++);
+                strings = cell.getStringCellValue().split("_");
+              }
+            }
+          }
+          if (!tmp.getComment().trim().equals(strings[0].trim())) {
+            throw new RRException(errorMessage);
+          }
+        });
+      }
+    }
+
     //判断 表格中除了表头是否有其他内容 row从0开始
-    if (sheet.getLastRowNum() < 2) {
+    if (sheet.getLastRowNum() < 3) { // 2
       throw new RRException("表中缺少用于导入的内容");
     }
 
   }
+
+  /**
+   * 获取合并单元格的值
+   * @param sheet 工作表
+   * @param row 行
+   * @return cell value
+   */
+  public Map<String, Map<Integer, Integer>> getMergeRegoinValue(Sheet sheet, int row) {
+    Map<String, Map<Integer, Integer>> mergeValue = new HashMap<>();
+    //获取整个sheet表所合并单元格
+    int sheetMergeRegion = sheet.getNumMergedRegions();
+    for (int i = 0; i < sheetMergeRegion; i++) {
+      CellRangeAddress cell =  sheet.getMergedRegion(i);
+      int firstColumn = cell.getFirstColumn();
+      int lastColumn = cell.getLastColumn();
+      int firstRow = cell.getFirstRow();
+      int lastRow = cell.getLastRow();
+
+      if (row >= firstRow && row <= lastRow) {
+        Map<Integer, Integer> num = new HashMap<>();
+        Row rw = sheet.getRow(firstRow);
+        Cell value = rw.getCell(firstColumn);
+        num.put(firstColumn, lastColumn);
+        mergeValue.put(getCellValue(value), num);
+      }
+    }
+    return mergeValue;
+  }
+
 
   /**
    * 生成消息.
@@ -279,12 +339,12 @@ public final class ExcelReader {
     String dataType = tableEntity.getDataType();
     String cellValue = getCellValue(cell);
     String messageTotal = "";
-      if ("int".equals(dataType) || "tinyint".equals(dataType) || "smallint".equals(dataType)
-          || "mediumint".equals(dataType)) {
-        messageTotal = "数据应该为int类型";
-        map.put("messageTotal", messageTotal);
-        Integer.parseInt(cellValue.replace(".0", ""));
-      }
+//      if ("int".equals(dataType) || "tinyint".equals(dataType) || "smallint".equals(dataType)
+//          || "mediumint".equals(dataType)) {
+//        messageTotal = "数据应该为int类型";
+//        map.put("messageTotal", messageTotal);
+//        Integer.parseInt(cellValue.replace(".0", ""));
+//      }
       if ("double".equals(dataType)) {
         messageTotal = "数据应该为double类型";
         map.put("messageTotal", messageTotal);

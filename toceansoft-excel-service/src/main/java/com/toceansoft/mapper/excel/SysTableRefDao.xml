@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.toceansoft.common.excel.dao.SysTableRefDao">
+
+    <select id="getInsertLine" resultType="com.toceansoft.common.excel.entity.SysTableRef">
+        SELECT str.ref_key as 'refkey',
+            str.ref_line as 'refLine',
+            str.ref_table_name AS 'refTableName',
+            str.ref_param AS 'refParam'
+            from sys_table_ref str
+            LEFT JOIN excel_config ec ON str.ref_key = ec.excel_config_key
+            WHERE ec.excel_config_key = #{key}
+            AND str.ref_table_name = #{tableName}
+            GROUP BY str.ref_line
+    </select>
+
+    <sql id="BaseSysTableRef">
+        ref_id AS 'refId', ref_table_name AS 'refTableName', ref_param AS 'refParam'
+    </sql>
+
+    <select id="getLineSysTableRef" resultType="com.toceansoft.common.excel.entity.SysTableRef">
+        SELECT
+        <include refid="BaseSysTableRef"/>
+        from sys_table_ref
+        WHERE ref_line = #{line}
+        AND ref_key = #{key}
+    </select>
+
+    <select id="getTableLine" resultType="Map" statementType="STATEMENT">
+        SELECT * FROM ${tableName}
+        <if test="order != null and order != ''">
+            ORDER BY ${order}
+        </if>
+        <if test="page != null and size != null">
+            LIMIT ${page}, ${size}
+        </if>
+    </select>
+
+    <select id="getLineByKeyAndName" resultType="Map" statementType="STATEMENT">
+        SELECT * FROM ${tableName}
+        <if test="idVal != null">
+            WHERE ${id} = ${idVal}
+        </if>
+    </select>
+
+    <select id="getCount" resultType="int" statementType="STATEMENT">
+        select count(1) from ${tableName}
+    </select>
+
+    <insert id="insertSysTableRef" parameterType="com.toceansoft.common.excel.entity.SysTableRef" useGeneratedKeys="true" keyProperty="refId">
+        insert into sys_table_ref
+        (
+        `ref_key`,
+        `ref_line`,
+        `ref_table_name`,
+        `ref_param`
+        )
+        values
+        (
+        #{refKey},
+        #{refLine},
+        #{refTableName},
+        #{refParam}
+        )
+    </insert>
+
+    <select id="findIsExistsLine" resultType="int">
+        SELECT count(1)
+        from sys_table_ref WHERE ref_key = #{keyName}
+        AND ref_table_name = #{tableName}
+        AND ref_line = #{line}
+    </select>
+</mapper>

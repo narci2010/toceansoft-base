@@ -30,6 +30,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.alibaba.fastjson.JSON;
+import com.toceansoft.codegenerator.entity.ColumnEntityVo;
 import com.toceansoft.codegenerator.service.SysGeneratorService;
 import com.toceansoft.codegenerator.utils.SwitchDB;
 import com.toceansoft.codegenerator.vo.DataSourceVo;
@@ -107,10 +108,8 @@ public class SysGeneratorController {
 	/**
 	 * 列表
 	 * 
-	 * @param queryVo
-	 *            QueryVo
-	 * @param tableName
-	 *            String
+	 * @param queryVo   QueryVo
+	 * @param tableName String
 	 * @return R
 	 */
 	@ResponseBody
@@ -137,16 +136,12 @@ public class SysGeneratorController {
 	/**
 	 * 生成代码
 	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @param response
-	 *            HttpServletResponse
-	 * @throws ServiceException
-	 *             se
+	 * @param request  HttpServletRequest
+	 * @param response HttpServletResponse
+	 * @throws ServiceException se
 	 */
 	@GetMapping("/code")
-	public void code(HttpServletRequest request, HttpServletResponse response)
-			throws ServiceException {
+	public void code(HttpServletRequest request, HttpServletResponse response) throws ServiceException {
 		switchDB.setCurrentThreadDataSource();
 		String[] tableNames = new String[] {};
 		String tables = request.getParameter("tables");
@@ -178,8 +173,7 @@ public class SysGeneratorController {
 		byte[] data = sysGeneratorService.generatorCode(tableNames, sysName, moduleName);
 
 		response.reset();
-		response.setHeader("Content-Disposition",
-				"attachment; filename=\"" + sysName + moduleName + ".zip\"");
+		response.setHeader("Content-Disposition", "attachment; filename=\"" + sysName + moduleName + ".zip\"");
 		response.addHeader("Content-Length", "" + data.length);
 		response.setContentType("application/octet-stream; charset=UTF-8");
 
@@ -193,8 +187,7 @@ public class SysGeneratorController {
 	}
 
 	/**
-	 * @param dataSourceVo
-	 *            DataSourceVo
+	 * @param dataSourceVo DataSourceVo
 	 * @return R
 	 */
 	@ResponseBody
@@ -222,8 +215,7 @@ public class SysGeneratorController {
 		Assert.isBlank(dataSourceVo.getDatabase(), "请填写数据库名称。");
 		Assert.isBlank(dataSourceVo.getUsername(), "请填写数据库用户名。");
 		Assert.isBlank(dataSourceVo.getPassword(), "请填写数据库用户密码。");
-		if (Judge.isBlank(dataSourceVo.getPort())
-				|| dataSourceVo.getPort().toLowerCase(Locale.CHINA).equals("null")) {
+		if (Judge.isBlank(dataSourceVo.getPort()) || dataSourceVo.getPort().toLowerCase(Locale.CHINA).equals("null")) {
 			dataSourceVo.setPort("3306");
 		} else if (!StringUtils.isNumeric(dataSourceVo.getPort())) {
 			throw new RRException("数据库端口必须为数据类型。");
@@ -238,6 +230,48 @@ public class SysGeneratorController {
 		// return R.error("创建数据库连接失败，请检查数据库初始化信息。");
 		// }
 		return R.ok("ok");
+	}
+
+	// 以下多表管理功能
+	/**
+	 * 
+	 * 查询数据库中全部表名（创建时间降序）
+	 * 
+	 * @return R
+	 */
+	@ResponseBody
+	@GetMapping("/queryTables")
+	public R queryTables() {
+		if (!switchDB.isInitDB()) {
+			return R.ok().put("tableNames", null);
+		}
+		switchDB.setCurrentThreadDataSource();
+
+		List<String> tableNames = sysGeneratorService.queryTables();
+
+		switchDB.clearCurrentThreadDataSource();
+		return R.ok().put("tableNames", tableNames);
+	}
+
+	/**
+	 * 
+	 * 查询指定表的全部字段
+	 * 
+	 * @param tableName String
+	 * @return R
+	 */
+	@ResponseBody
+	@GetMapping("/queryColumns")
+	public R queryColumns(String tableName) {
+		if (!switchDB.isInitDB()) {
+			return R.ok().put("columns", null);
+		}
+		switchDB.setCurrentThreadDataSource();
+
+		List<ColumnEntityVo> columns = sysGeneratorService.queryColumnsMany(tableName);
+
+		switchDB.clearCurrentThreadDataSource();
+		return R.ok().put("columns", columns);
 	}
 
 }

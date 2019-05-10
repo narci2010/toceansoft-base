@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.toceansoft.codegenerator.dao.SysGeneratorDao;
+import com.toceansoft.codegenerator.entity.ColumnEntityVo;
 import com.toceansoft.codegenerator.utils.GenUtils;
 import com.toceansoft.common.validator.Judge;
 
@@ -39,8 +40,7 @@ public class SysGeneratorService {
 
 	/**
 	 * 
-	 * @param map
-	 *            Map<String, Object>
+	 * @param map Map<String, Object>
 	 * @return Map<String, Object>
 	 */
 	public List<Map<String, Object>> queryList(Map<String, Object> map) {
@@ -49,8 +49,7 @@ public class SysGeneratorService {
 
 	/**
 	 * 
-	 * @param map
-	 *            Map<String, Object>
+	 * @param map Map<String, Object>
 	 * @return int
 	 */
 	public int queryTotal(Map<String, Object> map) {
@@ -59,8 +58,7 @@ public class SysGeneratorService {
 
 	/**
 	 * 
-	 * @param tableName
-	 *            String
+	 * @param tableName String
 	 * @return Map<String, String>
 	 */
 	public Map<String, String> queryTable(String tableName) {
@@ -69,8 +67,15 @@ public class SysGeneratorService {
 
 	/**
 	 * 
-	 * @param tableName
-	 *            String
+	 * @return List<String>
+	 */
+	public List<String> queryTables() {
+		return sysGeneratorDao.queryTables();
+	}
+
+	/**
+	 * 
+	 * @param tableName String
 	 * @return List<Map<String, String>>
 	 */
 	public List<Map<String, String>> queryColumns(String tableName) {
@@ -79,12 +84,18 @@ public class SysGeneratorService {
 
 	/**
 	 * 
-	 * @param tableNames
-	 *            String[]
-	 * @param sysName
-	 *            String
-	 * @param moduleName
-	 *            moduleName
+	 * @param tableName String
+	 * @return List<ColumnEntityVo>
+	 */
+	public List<ColumnEntityVo> queryColumnsMany(String tableName) {
+		return sysGeneratorDao.queryColumnsMany(tableName);
+	}
+
+	/**
+	 * 
+	 * @param tableNames String[]
+	 * @param sysName    String
+	 * @param moduleName moduleName
 	 * @return byte[]
 	 */
 	public byte[] generatorCode(String[] tableNames, String sysName, String moduleName) {

@@ -17,7 +17,8 @@
 		 SELECT ec.excel_config_id AS excelConfigId,
             ec.excel_config_key AS excelConfigKey,
             ec.excel_config_tablename AS excelConfigTablename,
-            ece.excel_config_exclude_column AS  excelConfigExcludeColumn
+            ece.excel_config_exclude_column AS  excelConfigExcludeColumn,
+            ece.excel_config_exclude_id AS  excelConfigExcludeId
     FROM excel_config ec
     LEFT JOIN  excel_config_exclude  ece
     ON ec.excel_config_id = ece.excel_config_id
@@ -111,7 +112,7 @@
       AND  ec.excel_config_key LIKE concat('%',#{excelConfigKey},'%')
 		</if>
 		<if test="excelConfigTablename != null and excelConfigTablename != ''">
-			AND  ec.excel_config_tablename LIKE concat('%',#{excelConfigTablename},'%')
+			AND  ec.excel_config_tablename = #{excelConfigTablename}
 		</if>
 	</select>
 

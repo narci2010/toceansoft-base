@@ -17,6 +17,7 @@
 			`perms`, 
 			`type`, 
 			`icon`, 
+			`is_display`, 			
 			`order_num`
 		)
 		values
@@ -28,6 +29,7 @@
 			#{perms}, 
 			#{type}, 
 			#{icon}, 
+			#{isDisplay}, 
 			#{orderNum}
 		)
 	</insert>
@@ -78,6 +80,7 @@
 			<if test="perms != null">`perms` = #{perms}, </if>
 			<if test="type != null">`type` = #{type}, </if>
 			<if test="icon != null">`icon` = #{icon}, </if>
+			<if test="isDisplay != null">`is_display` = #{isDisplay}, </if>
 			<if test="orderNum != null">`order_num` = #{orderNum}</if>
 		</set>
 		where menu_id = #{menuId}

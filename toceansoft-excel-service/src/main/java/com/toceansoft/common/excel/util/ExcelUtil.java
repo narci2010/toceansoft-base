@@ -17,9 +17,9 @@ package com.toceansoft.common.excel.util;
 
 
 import com.toceansoft.common.exception.RRException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
+
+import java.io.*;
+import java.net.URLEncoder;
 import java.util.List;
 import java.util.Date;
 import java.util.ArrayList;
@@ -47,8 +47,6 @@ import org.apache.poi.ss.usermodel.VerticalAlignment;
 import org.apache.poi.ss.util.CellRangeAddress;
 
 import javax.servlet.http.HttpServletResponse;
-import java.io.OutputStream;
-import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 
 
@@ -175,12 +173,12 @@ public class ExcelUtil {
    *
    * @param wb workbook 对象
    * @param entityVo excelEntityVo 工具类
+   * @param keyName key关键词
+   * @param num key数组
    * @return HSSFSheet
    */
-  public static HSSFSheet createSheet(HSSFWorkbook wb, ExcelEntityVo entityVo) {
-    if (StringUtils.isEmpty(entityVo.getSheetName())) {
-      entityVo.setSheetName(SHEET_NAME);
-    }
+  public static HSSFSheet createSheet(HSSFWorkbook wb, ExcelEntityVo entityVo,
+                                      String[] keyName, int[] num) {
     HSSFSheet sheet = null;
     sheet = wb.createSheet(entityVo.getSheetName());
 
@@ -197,23 +195,36 @@ public class ExcelUtil {
     HSSFCell cellTitle = rowTitle.createCell(0);
 
     // 合并列标题
-    if (entityVo.getColumnNumber() > 0) {
-      sheet.addMergedRegion(new CellRangeAddress(0, 0, 0,
-          entityVo.getColumnNumber() - 1));
-    } else {
-      sheet.addMergedRegion(new CellRangeAddress(0, 0, 0,
-          COLUMN_NAME.length - 1));
-    }
+    sheet.addMergedRegion(new CellRangeAddress(0, 0, 0,
+            entityVo.getColumnNumber() - 1));
 
     // 设置值标题
-    if (StringUtils.isEmpty(entityVo.getTitleName())) {
-      cellTitle.setCellValue(TITLE_NAME);
-    } else {
-      cellTitle.setCellValue(entityVo.getTitleName());
-    }
+    cellTitle.setCellValue(entityVo.getTitleName());
 
     // 设置标题样式
     cellTitle.setCellStyle(hcs);
+
+
+    // 创建第1行 关键字key
+    int temp = 0;
+    HSSFRow rowTitle1 = sheet.createRow((int) 1);
+    for (int i = 0; i < num.length; i++) {
+
+      HSSFCell column = rowTitle1.createCell(temp);
+      column.setCellValue(keyName[i]);
+      column.setCellStyle(hcs);
+
+      if (i == 0) {
+        sheet.addMergedRegion(new CellRangeAddress(1, 1, 0,
+                num[i] - 1));
+      } else {
+        sheet.addMergedRegion(new CellRangeAddress(1, 1, temp,
+                num[i] + temp - 1));
+      }
+      temp += num[i];
+    }
+
+
     return sheet;
   }
 
@@ -236,36 +247,74 @@ public class ExcelUtil {
 
   /**
    * 下载 Excel 模板
-   *
-   * @param response 响应头信息
+   * @param response 响应头
    * @param entityVo excel表单工具类
    */
-  public static void createExcelModel(HttpServletResponse response, ExcelEntityVo entityVo) {
+  public static void createExcelModel(HttpServletResponse response, List<ExcelEntityVo> entityVo) {
     HSSFWorkbook wb = createWorkBook();
     HSSFSheet sheet = null;
     if (entityVo == null) {
       throw new RRException("未传入任何需要导入至Excel表单的相关信息！");
     }
-    if (entityVo.getColumnName().length > 0) {
-      entityVo.setColumnNumber(entityVo.getColumnName().length);
+
+    int entityLength = 0, isRequireLength = 0, i = 0, k = 0;
+    for (ExcelEntityVo vo: entityVo) {
+      entityLength += vo.getColumnName().length;
+      isRequireLength += vo.getIsRequireName().length;
     }
-    if (StringUtils.isEmpty(entityVo.getSheetName())) {
-      entityVo.setSheetName(SHEET_NAME);
+
+    // 获取所有列合并到一起
+    String[] columnName = new String[entityLength];
+    // 必填字段
+    String[] isRequireName = new String[isRequireLength];
+    // 存放key关键字
+    String[] sheetName = new String[entityVo.size()];
+    int[] keyLength = new int[entityVo.size()];
+    int j = 0;
+    for (ExcelEntityVo vo: entityVo) {
+      for (String tmp: vo.getColumnName()) {
+        columnName[i] = tmp;
+        i++;
+      }
+      for (String require : vo.getIsRequireName()) {
+        isRequireName[k] = require;
+        k++;
+      }
+      sheetName[j] = vo.getSheetName();
+      keyLength[j] = vo.getColumnName().length;
+      j++;
     }
-    if (StringUtils.isEmpty(entityVo.getTitleName())) {
-      entityVo.setTitleName(TITLE_NAME);
+
+    ExcelEntityVo vo = new ExcelEntityVo();
+    vo.setColumnName(columnName);
+    vo.setIsRequireName(isRequireName);
+    if (columnName.length > 0) {
+      vo.setColumnNumber(columnName.length);
     }
-    sheet = createSheet(wb, entityVo);
-    HSSFRow row = sheet.createRow((short) 1);
+    if (StringUtils.isEmpty(vo.getSheetName())) {
+      vo.setSheetName(SHEET_NAME);
+    }
+    if (StringUtils.isEmpty(vo.getTitleName())) {
+      vo.setTitleName(TITLE_NAME);
+    }
+
+    // 创建标题
+    sheet = createSheet(wb, vo, sheetName, keyLength);
+
+    HSSFRow row = sheet.createRow((short) 2);
     row.setHeightInPoints((short) 20);
+
     HSSFCellStyle toFontRequireStyle = toFontRequireStyle(wb);
 //    HSSFCellStyle cellStyle = createCellStyle(wb, entityVo);
-    createCellColumn(row, entityVo.getColumnNumber(), entityVo.getColumnName(),
-        entityVo.getIsRequireName(), toFontRequireStyle);
-    if (StringUtils.isEmpty(entityVo.getFileName())) {
-      entityVo.setFileName("Excel导出模板");
+
+    createCellColumn(row, vo.getColumnNumber(), vo.getColumnName(),
+        vo.getIsRequireName(), toFontRequireStyle);
+
+    if (StringUtils.isEmpty(vo.getFileName())) {
+      vo.setFileName("Excel导出模板");
     }
-    getOutputStream(wb, entityVo.getFileName(), response);
+
+    getOutputStream(wb, vo.getFileName(), response);
   }
 
 
@@ -366,36 +415,29 @@ public class ExcelUtil {
    * @param wb workbook对象
    * @param fileName 文件名
    * @param response 响应头
-   * @return String
    * @throws IOException IO流异常
    */
-  public static String getOutputStream(HSSFWorkbook wb, String fileName,
-      HttpServletResponse response) {
-    String str = null;
+  public static void getOutputStream(HSSFWorkbook wb, String fileName,
+                  HttpServletResponse response) {
     OutputStream out = null;
     try {
       // 下载文件
       if (StringUtils.isEmpty(fileName)) {
         SimpleDateFormat format = new SimpleDateFormat("yyyyMMddHHmmss");
-        //要保存的文件名
         fileName = format.format(new Date()) + ".xls";
+      } else {
+        fileName = fileName + ".xls";
       }
-      String newFileName = fileName + ".xls";
-      response.setContentType("application/ms-excel;charset=UTF-8");
-      response.setHeader("Content-Disposition", "attachment;filename="
-              .concat(String.valueOf(URLEncoder.encode(newFileName, "UTF-8"))));
-      out = response.getOutputStream();
-      // 将数据写出去
-      wb.write(out);
-      str = "导出" + fileName + "成功！";
-    } catch (UnsupportedEncodingException uee) {
 
-      log.info("导出失败: " + uee.toString());
+      response.setContentType("application/x-msdownload;charset=UTF-8");
+      response.setHeader("Content-Disposition", "attachment;filename="
+              .concat(String.valueOf(URLEncoder.encode(fileName, "UTF-8"))));
+
+      out = response.getOutputStream();
+      wb.write(out);
 
     } catch (IOException e) {
-
       log.info("导出失败: " + e.toString());
-
     } finally {
       if (out != null) {
         try {
@@ -405,10 +447,82 @@ public class ExcelUtil {
         }
       }
     }
-    return str;
   }
 
 
+  /**
+   * 删除文件或目录
+   * @param file 文件
+   * @return boolean
+   */
+  public static boolean deleteFile(File file) {
+    boolean flag = false;
+    if (file.isFile()) {
+      flag = file.delete();
+    } else if (file.isDirectory()) {
+      File[] files = file.listFiles();
+      if (files == null) {
+        throw new RRException("获取文件路径失败");
+      }
+      for (int i = 0; i < files.length; i++) {
+        deleteFile(files[i]);
+      }
+      flag = file.delete();
+      log.debug("flag: " + flag);
+    }
+    return flag;
+  }
+
+
+  /**
+   * 读取文件流
+   * @param response 响应头
+   * @param filePath 文件路径
+   */
+  public void outputStream(HttpServletResponse response, String filePath) {
+    String msg = "导出Excel文件失败";
+    FileInputStream stream = null;
+    OutputStream ou = null;
+    try {
+      response.setContentType("application/octet-stream"); // application/x-msdownload;charset=UTF-8
+      response.setHeader("Content-Disposition", "attachment;filename="
+              .concat(String.valueOf(URLEncoder.encode("upload.zip", "UTF-8"))));
+
+      File zipFile = ZipUtil.zipDirectory(filePath);
+      log.info("zipFile: " + zipFile);
+
+      stream = new FileInputStream(zipFile);
+      byte[] b = new byte[1024];
+      int i = 0;
+      ou = response.getOutputStream();
+      while ((i = stream.read(b)) > 0) {
+        ou.write(b, 0, i);
+      }
+      ou.flush();
+
+      msg = "导出Excel文件成功";
+    } catch (UnsupportedEncodingException e) {
+      log.info("outputStream: " + e.getLocalizedMessage());
+    } catch (IOException io) {
+      log.info("outputStream: " + io.getLocalizedMessage());
+    } finally {
+      if (ou != null) {
+        try {
+          ou.close();
+        } catch (IOException e) {
+          log.info("outputStream: " + e.toString());
+        }
+      }
+      if (stream != null) {
+        try {
+          stream.close();
+        } catch (IOException e) {
+          log.info("outputStream: " + e.toString());
+        }
+      }
+    }
+    log.info("result: " + msg);
+  }
 
 
 }

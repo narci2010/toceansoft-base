@@ -55,4 +55,10 @@ public class ExcelEntityVo {
 
     /**  颜色 */
     private short colorFont;
+
+    /** 保存 key 关键词 */
+    private String[] keyName;
+
+    /** 保存各key的总字段数量 */
+    private int[] keyLength;
 }

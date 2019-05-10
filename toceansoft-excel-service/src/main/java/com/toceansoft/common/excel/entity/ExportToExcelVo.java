@@ -26,10 +26,10 @@ import java.util.Map;
 public class ExportToExcelVo {
 
     /** 表结构字段 */
-    private List<TableEntity> tableEntity;
+    private Map<String, List<TableEntity>> tableEntity;
 
     /** 数据集 */
-    private List<Map<String, Object>> objectList;
+    private Map<String, List<Map<String, Object>>> objectList;
 
     /** 文件名 */
     private String fileName;
@@ -39,4 +39,7 @@ public class ExportToExcelVo {
 
     /** 内容标题 */
     private String titleName;
+
+    /** 导出字段总大小 */
+    private Integer columnNumber;
 }

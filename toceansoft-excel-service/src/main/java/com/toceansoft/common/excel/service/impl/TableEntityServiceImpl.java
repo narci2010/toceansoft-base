@@ -35,6 +35,11 @@ public class TableEntityServiceImpl implements TableEntityService {
   }
 
   @Override
+  public TableEntity getTableInfoByPrimary(String tableName) {
+    return tableEntityDao.getTableInfoByPrimary(tableName);
+  }
+
+  @Override
   public List<TableEntity>  getTableInfoExclude(String tableName) {
     List<TableEntity> list = tableEntityDao.getTableInfo(tableName);
     List<TableEntity> resultList =  new ArrayList<>();
@@ -53,8 +58,8 @@ public class TableEntityServiceImpl implements TableEntityService {
   }
 
   @Override
-  public List<Map<String, Object>> getTableInfo(String tableName, List<TableEntity> table) {
-    return  tableEntityDao.getTableInfo(tableName, table);
+  public Map<String, Object> getTableInfo(String tableName, List<TableEntity> table, String id, long idVal) {
+    return  tableEntityDao.getTableInfo(tableName, table, id, idVal);
   }
   /**
    * 获取数据池1 数据库中的所有表名
