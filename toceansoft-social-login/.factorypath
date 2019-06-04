@@ -124,6 +124,7 @@
     <factorypathentry kind="VARJAR" id="M2_REPO/org/springframework/plugin/spring-plugin-metadata/1.2.0.RELEASE/spring-plugin-metadata-1.2.0.RELEASE.jar" enabled="true" runInBatchMode="false"/>
     <factorypathentry kind="VARJAR" id="M2_REPO/org/mapstruct/mapstruct/1.1.0.Final/mapstruct-1.1.0.Final.jar" enabled="true" runInBatchMode="false"/>
     <factorypathentry kind="VARJAR" id="M2_REPO/io/springfox/springfox-swagger-ui/2.7.0/springfox-swagger-ui-2.7.0.jar" enabled="true" runInBatchMode="false"/>
+    <factorypathentry kind="VARJAR" id="M2_REPO/com/toceansoft/spring-rediscache/1.2.3-RELEASE/spring-rediscache-1.2.3-RELEASE-enhance.jar" enabled="true" runInBatchMode="false"/>
     <factorypathentry kind="VARJAR" id="M2_REPO/org/quartz-scheduler/quartz/2.3.0/quartz-2.3.0.jar" enabled="true" runInBatchMode="false"/>
     <factorypathentry kind="VARJAR" id="M2_REPO/com/mchange/mchange-commons-java/0.2.11/mchange-commons-java-0.2.11.jar" enabled="true" runInBatchMode="false"/>
     <factorypathentry kind="VARJAR" id="M2_REPO/org/apache/shiro/shiro-core/1.4.0/shiro-core-1.4.0.jar" enabled="true" runInBatchMode="false"/>

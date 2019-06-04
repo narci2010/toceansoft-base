@@ -27,7 +27,7 @@ import org.springframework.stereotype.Service;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.toceansoft.common.exception.RRException;
-import com.toceansoft.common.json.JacksonUtil;
+import com.toceansoft.common.json.JsonUtil;
 import com.toceansoft.sociallogin.util.TokenUtil;
 import com.toceansoft.sociallogin.vo.WeiboUser;
 
@@ -188,7 +188,7 @@ public class OauthSina extends Oauth {
 		dataMap.put("access_token", accessToken);
 		// log.debug(dataMap.toString());
 		// String userInfo = getUserInfo(accessToken, uid);
-		WeiboUser user = JacksonUtil.json2BeanSnakeCase(dataMap.toString(), WeiboUser.class);
+		WeiboUser user = JsonUtil.json2BeanSnakeCase(dataMap.toString(), WeiboUser.class);
 		return user;
 	}
 }

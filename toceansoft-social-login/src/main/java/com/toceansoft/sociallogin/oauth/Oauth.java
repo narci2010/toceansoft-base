@@ -26,7 +26,7 @@ import org.apache.commons.lang.StringUtils;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.toceansoft.common.exception.RRException;
-import com.toceansoft.common.json.JacksonUtil;
+import com.toceansoft.common.json.JsonUtil;
 import com.toceansoft.common.utils.RequestContextHolderUtil;
 import com.toceansoft.sociallogin.util.HttpKit;
 import com.toceansoft.sociallogin.util.TokenUtil;
@@ -76,7 +76,7 @@ public class Oauth {
 	 */
 	public OAuth2Token parseStringAccessToken(String accessToken)
 			throws JsonParseException, JsonMappingException, IOException {
-		OAuth2Token o = JacksonUtil.json2BeanSnakeCase(accessToken, OAuth2Token.class);
+		OAuth2Token o = JsonUtil.json2BeanSnakeCase(accessToken, OAuth2Token.class);
 		return o;
 	}
 

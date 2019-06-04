@@ -12,7 +12,7 @@ import org.springframework.rediscache.vo.Permission;
 
 import com.toceansoft.common.CommonUtils;
 import com.toceansoft.common.PropertiesUtils;
-import com.toceansoft.common.json.JacksonUtil;
+import com.toceansoft.common.json.JsonUtil;
 import com.toceansoft.common.utils.HttpClientTool;
 import com.toceansoft.common.validator.Judge;
 
@@ -47,7 +47,7 @@ public final class DevUtils {
 
 			String signKey = HttpClientTool.doPostForRestEntity(url, params);
 			// System.out.println("signKey:" + signKey);
-			Map map = JacksonUtil.json2Bean(signKey, Map.class);
+			Map map = JsonUtil.json2Bean(signKey, Map.class);
 			String granted = null;
 			int dueDays = 0;
 			if (map != null) {
@@ -95,7 +95,7 @@ public final class DevUtils {
 			try {
 
 				String signKey = HttpClientTool.doPostForRestEntity(url, params);
-				Map map = JacksonUtil.json2Bean(signKey, Map.class);
+				Map map = JsonUtil.json2Bean(signKey, Map.class);
 				String granted = null;
 				int dueDays = 0;
 				if (map != null) {
@@ -147,7 +147,7 @@ public final class DevUtils {
 					String targetUrl = url + "/sys/syslisence/systemname/" + appName;
 					// System.out.println("targetUrl:" + targetUrl);
 					String result = HttpClientTool.doPutForRestEntity(targetUrl, params);
-					Map map = JacksonUtil.json2Bean(result, Map.class);
+					Map map = JsonUtil.json2Bean(result, Map.class);
 					if (map != null) {
 						appNameMsg = (String) map.get("msg");
 					}
@@ -160,7 +160,7 @@ public final class DevUtils {
 					String targetUrl = url + "/sys/syslisence/systemurl/" + lisence.getAppServerUrl();
 					// System.out.println("targetUrl:" + targetUrl);
 					String result = HttpClientTool.doPutForRestEntity(targetUrl, params);
-					Map map = JacksonUtil.json2Bean(result, Map.class);
+					Map map = JsonUtil.json2Bean(result, Map.class);
 					if (map != null) {
 						appServerUrlMsg = (String) map.get("msg");
 					}

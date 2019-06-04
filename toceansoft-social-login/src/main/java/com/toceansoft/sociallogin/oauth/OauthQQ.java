@@ -27,7 +27,7 @@ import org.springframework.stereotype.Service;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.toceansoft.common.exception.RRException;
-import com.toceansoft.common.json.JacksonUtil;
+import com.toceansoft.common.json.JsonUtil;
 import com.toceansoft.sociallogin.util.TokenUtil;
 import com.toceansoft.sociallogin.vo.QQUser;
 
@@ -201,7 +201,7 @@ public class OauthQQ extends Oauth {
 	 *             ioe
 	 */
 	public QQUser getQQUser(String jsonUserInfo) throws IOException {
-		QQUser user = JacksonUtil.json2BeanSnakeCase(jsonUserInfo, QQUser.class);
+		QQUser user = JsonUtil.json2BeanSnakeCase(jsonUserInfo, QQUser.class);
 		return user;
 	}
 }

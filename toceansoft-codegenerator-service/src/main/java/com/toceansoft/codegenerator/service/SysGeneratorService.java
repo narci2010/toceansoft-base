@@ -13,6 +13,7 @@ package com.toceansoft.codegenerator.service;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.zip.ZipOutputStream;
@@ -23,6 +24,8 @@ import org.springframework.stereotype.Service;
 import com.toceansoft.codegenerator.dao.SysGeneratorDao;
 import com.toceansoft.codegenerator.entity.ColumnEntityVo;
 import com.toceansoft.codegenerator.utils.GenUtils;
+import com.toceansoft.common.exception.RRException;
+import com.toceansoft.common.validator.Assert;
 import com.toceansoft.common.validator.Judge;
 
 import lombok.extern.slf4j.Slf4j;
@@ -111,6 +114,78 @@ public class SysGeneratorService {
 			GenUtils.generatorCode(table, columns, zip, sysName, moduleName);
 		}
 
+		try {
+			if (!Judge.isNull(zip)) {
+				zip.close();
+			}
+		} catch (IOException e) {
+			log.debug("关闭IO流失败。");
+		}
+
+		return outputStream.toByteArray();
+	}
+
+	/**
+	 * 
+	 * @param tableNames     String[]
+	 * @param tableOfColumns Map<String,List<String>>
+	 * @param sysName        String
+	 * @param moduleName     moduleName
+	 * @return byte[]
+	 */
+	public byte[] generatorCodeMany(String[] tableNames, Map<String, List<String>> tableOfColumns, String sysName,
+			String moduleName) {
+		Assert.isEmtpy(tableNames, "表名数组不能为空。");
+		Assert.isEmtpy(tableOfColumns, "表名-字段map不能为空。");
+		if (tableNames.length < 2) {
+			throw new RRException("多表关联代码生成至少选择两个表。");
+		}
+		if (tableOfColumns.size() < 2) {
+			throw new RRException("多表关联代码生成至少选择两个表相应的字段属性。");
+		}
+		if (tableOfColumns.size() != tableNames.length) {
+			throw new RRException("关联表数量及选择字段表的数量不匹配。");
+		}
+		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+		ZipOutputStream zip = new ZipOutputStream(outputStream);
+
+		// 参与关联表数组
+		List<Map<String, String>> tables = new ArrayList<Map<String, String>>();
+
+		// 选择的字段
+		List<Map<String, String>> selectColumns = new ArrayList<Map<String, String>>();
+
+		for (String tableName : tableNames) {
+			// log.debug("generatorCodeMany:" + tableName);
+			// 查询表信息
+			Map<String, String> table = queryTable(tableName);
+			tables.add(table);
+
+			// 查询列信息
+			List<Map<String, String>> columns = queryColumns(tableName);
+			// 选中的字段
+			List<String> includeColumns = tableOfColumns.get(tableName);
+			for (Map<String, String> column : columns) {
+				// log.debug("column:" + column);
+				for (String includeColumn : includeColumns) {
+					// log.debug("includeColumn:" + includeColumn);
+					if (column.get("columnName").equals(includeColumn)) {
+						// 在选中字段中存在的字段才放进已选中字段
+						selectColumns.add(column);
+					}
+				}
+			}
+
+		}
+		for (Map<String, String> selectColumn : selectColumns) {
+			for (Map.Entry<String, String> entry : selectColumn.entrySet()) {
+				log.debug(entry.getKey() + ":" + entry.getValue());
+			}
+			log.debug("++++++++++++++++++++++++++++++++++++++++++++++++++");
+		}
+		// 生成代码
+		// GenUtils.generatorCode(table, columns, zip, sysName, moduleName);
+		GenUtils.generatorCodeMany(tables, null, zip, sysName, moduleName);
 		try {
 			if (!Judge.isNull(zip)) {
 				zip.close();

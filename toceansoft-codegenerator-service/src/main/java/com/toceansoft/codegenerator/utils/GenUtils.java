@@ -66,21 +66,34 @@ public class GenUtils {
 	}
 
 	/**
+	 * 
+	 * @return List<String>
+	 */
+	public static List<String> getTemplatesMany() {
+		List<String> templates = new ArrayList<String>();
+		templates.add("template/EntityMany.java.vm");
+		templates.add("template/DaoMany.java.vm");
+		templates.add("template/DaoMany.xml.vm");
+		templates.add("template/ServiceMany.java.vm");
+		templates.add("template/ServiceImplMany.java.vm");
+		templates.add("template/ControllerMany.java.vm");
+		templates.add("template/listMany.html.vm");
+		templates.add("template/listMany.js.vm");
+		templates.add("template/menuMany.sql.vm");
+		return templates;
+	}
+
+	/**
 	 * 生成代码
 	 * 
-	 * @param table
-	 *            String
-	 * @param columns
-	 *            List<Map<String, String>>
-	 * @param zip
-	 *            ZipOutputStream
-	 * @param sysName
-	 *            String
-	 * @param moduleName
-	 *            String
+	 * @param table      Map<String, String>
+	 * @param columns    List<Map<String, String>>
+	 * @param zip        ZipOutputStream
+	 * @param sysName    String
+	 * @param moduleName String
 	 */
-	public static void generatorCode(Map<String, String> table, List<Map<String, String>> columns,
-			ZipOutputStream zip, String sysName, String moduleName) {
+	public static void generatorCode(Map<String, String> table, List<Map<String, String>> columns, ZipOutputStream zip,
+			String sysName, String moduleName) {
 		// 配置信息
 		Configuration config = getConfig();
 		Boolean hasBigDecimal = false;
@@ -133,8 +146,7 @@ public class GenUtils {
 
 		// 设置velocity资源加载器
 		Properties prop = new Properties();
-		prop.put("file.resource.loader.class",
-				"org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader");
+		prop.put("file.resource.loader.class", "org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader");
 		Velocity.init(prop);
 		// String mainPath = config.getString("mainPath");
 		// mainPath = StringUtils.isBlank(mainPath) ? "com.toceansoft.base" : mainPath;
@@ -157,8 +169,140 @@ public class GenUtils {
 		genCodeByTemplates(zip, moduleName, tableEntity, packageStr, context);
 	}
 
-	private static void genCodeByTemplates(ZipOutputStream zip, String moduleName,
-			TableEntity tableEntity, String packageStr, VelocityContext context) {
+	/**
+	 * 生成代码 多表关联
+	 * 
+	 * @param tables         List<Map<String, String>>
+	 * @param tableOfColumns Map<String,List<Map<String, String>>>
+	 * @param zip            ZipOutputStream
+	 * @param sysName        String
+	 * @param moduleName     String
+	 */
+	public static void generatorCodeMany(List<Map<String, String>> tables,
+			Map<String, List<Map<String, String>>> tableOfColumns, ZipOutputStream zip, String sysName,
+			String moduleName) {
+		// 配置信息
+		Configuration config = getConfig();
+		Boolean hasBigDecimal = false;
+		Boolean hasDate = false;
+		// 表信息
+		TableEntity tableEntity = new TableEntity();
+		String tableName = "";
+		StringBuffer tableComments = new StringBuffer("");
+		List<String> tableNameList = new ArrayList<String>();
+		for (Map<String, String> table : tables) {
+			tableName += table.get("tableName");
+			tableComments.append(" " + table.get("tableComment"));
+			tableNameList.add(tableName);
+		}
+		tableEntity.setTableName(tableName);
+		tableEntity.setComments(tableComments.toString());
+
+		// 表名转换成Java类名
+		String className = tableToJava(tableEntity.getTableName(), config.getString("tablePrefix"));
+		tableEntity.setClassName(className);
+		tableEntity.setClassname(StringUtils.uncapitalize(className));
+
+		// 列信息
+		List<ColumnEntity> columsList = new ArrayList<>();
+
+		// 取出第一个表（主表的字段信息）
+		// List<Map<String, String>> columns = tableOfColumns.get(tableNameList.get(0));
+
+		for (String tableNameTmp : tableNameList) {
+			List<Map<String, String>> columns = tableOfColumns.get(tableNameTmp);
+			for (Map<String, String> column : columns) {
+				ColumnEntity columnEntity = new ColumnEntity();
+				columnEntity.setColumnName(column.get("columnName"));
+				columnEntity.setDataType(column.get("dataType"));
+				columnEntity.setComments(column.get("columnComment"));
+				columnEntity.setExtra(column.get("extra"));
+
+				// 列名转换成Java属性名
+				String attrName = columnToJava(columnEntity.getColumnName());
+				columnEntity.setAttrName(attrName);
+				columnEntity.setAttrname(StringUtils.uncapitalize(attrName));
+
+				// 列的数据类型，转换成Java类型
+				String attrType = config.getString(columnEntity.getDataType(), "unknowType");
+				columnEntity.setAttrType(attrType);
+				if (!hasBigDecimal && attrType.equals("BigDecimal")) {
+					hasBigDecimal = true;
+				}
+				if (!hasDate && attrType.equals("Date")) {
+					hasDate = true;
+				}
+				// 是否主键
+				if ("PRI".equalsIgnoreCase(column.get("columnKey")) && tableEntity.getPk() == null) {
+					tableEntity.setPk(columnEntity);
+				}
+
+				columsList.add(columnEntity);
+			}
+		}
+		tableEntity.setColumns(columsList);
+
+		// 没主键，则第一个字段为主键
+		if (tableEntity.getPk() == null) {
+			tableEntity.setPk(tableEntity.getColumns().get(0));
+		}
+
+		// 设置velocity资源加载器
+		Properties prop = new Properties();
+		prop.put("file.resource.loader.class", "org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader");
+		Velocity.init(prop);
+		// String mainPath = config.getString("mainPath");
+		// mainPath = StringUtils.isBlank(mainPath) ? "com.toceansoft.base" : mainPath;
+		// 封装模板数据
+		Map<String, Object> map = new HashMap<>();
+		String packageStr = config.getString("package") + "." + sysName;
+
+		// 准备基本信息
+		map.put("hasBigDecimal", hasBigDecimal);
+		map.put("hasDate", hasDate);
+		map.put("author", config.getString("author"));
+		map.put("email", config.getString("email"));
+		map.put("datetime", DateUtils.format(new Date(), DateUtils.DATE_TIME_PATTERN));
+		map.put("package", packageStr);
+		map.put("moduleName", moduleName);
+
+		prepareTableEntityConfig(tableEntity, map);
+		VelocityContext context = new VelocityContext(map);
+
+		genCodeByTemplatesMany(zip, moduleName, tableEntity, packageStr, context);
+	}
+
+	private static void genCodeByTemplatesMany(ZipOutputStream zip, String moduleName, TableEntity tableEntity,
+			String packageStr, VelocityContext context) {
+		// 获取模板列表
+		List<String> templates = getTemplatesMany();
+		for (String template : templates) {
+			// 渲染模板
+			StringWriter sw = new StringWriter();
+			Template tpl = Velocity.getTemplate(template, "UTF-8");
+			tpl.merge(context, sw);
+
+			try {
+				// 添加到zip
+				zip.putNextEntry(
+						new ZipEntry(getFileName(template, tableEntity.getClassName(), packageStr, moduleName)));
+				IOUtils.write(sw.toString(), zip, "UTF-8");
+				try {
+					if (!Judge.isNull(sw)) {
+						sw.close();
+					}
+				} catch (Exception e) {
+					throw new RRException("关闭资源失败。", e);
+				}
+				zip.closeEntry();
+			} catch (IOException e) {
+				throw new RRException("渲染模板失败，表名：" + tableEntity.getTableName(), e);
+			}
+		}
+	}
+
+	private static void genCodeByTemplates(ZipOutputStream zip, String moduleName, TableEntity tableEntity,
+			String packageStr, VelocityContext context) {
 		// 获取模板列表
 		List<String> templates = getTemplates();
 		for (String template : templates) {
@@ -169,8 +313,8 @@ public class GenUtils {
 
 			try {
 				// 添加到zip
-				zip.putNextEntry(new ZipEntry(
-						getFileName(template, tableEntity.getClassName(), packageStr, moduleName)));
+				zip.putNextEntry(
+						new ZipEntry(getFileName(template, tableEntity.getClassName(), packageStr, moduleName)));
 				IOUtils.write(sw.toString(), zip, "UTF-8");
 				try {
 					if (!Judge.isNull(sw)) {
@@ -200,8 +344,7 @@ public class GenUtils {
 	/**
 	 * 列名转换成Java属性名
 	 * 
-	 * @param columnName
-	 *            String
+	 * @param columnName String
 	 * @return String
 	 */
 	public static String columnToJava(String columnName) {
@@ -211,10 +354,8 @@ public class GenUtils {
 	/**
 	 * 表名转换成Java类名
 	 * 
-	 * @param tableName
-	 *            String
-	 * @param tablePrefix
-	 *            String
+	 * @param tableName   String
+	 * @param tablePrefix String
 	 * @return String
 	 */
 	public static String tableToJava(String tableName, String tablePrefix) {
@@ -240,23 +381,17 @@ public class GenUtils {
 	/**
 	 * 获取文件名
 	 * 
-	 * @param template
-	 *            String
-	 * @param className
-	 *            String
-	 * @param packageName
-	 *            String
-	 * @param moduleName
-	 *            String
+	 * @param template    String
+	 * @param className   String
+	 * @param packageName String
+	 * @param moduleName  String
 	 * @return String
 	 */
-	public static String getFileName(String template, String className, String packageName,
-			String moduleName) {
+	public static String getFileName(String template, String className, String packageName, String moduleName) {
 		String packagePath = "main" + File.separator + "java" + File.separator;
 		String filename = null;
 		if (StringUtils.isNotBlank(packageName)) {
-			packagePath += packageName.replace(".", File.separator) + File.separator + moduleName
-					+ File.separator;
+			packagePath += packageName.replace(".", File.separator) + File.separator + moduleName + File.separator;
 		}
 
 		if (template.contains("Entity.java.vm")) {
@@ -272,8 +407,8 @@ public class GenUtils {
 		} else
 
 		if (template.contains("ServiceImpl.java.vm")) {
-			filename = packagePath + "service" + File.separator + "impl" + File.separator
-					+ className + "ServiceImpl.java";
+			filename = packagePath + "service" + File.separator + "impl" + File.separator + className
+					+ "ServiceImpl.java";
 		} else
 
 		if (template.contains("Controller.java.vm")) {
@@ -281,20 +416,19 @@ public class GenUtils {
 		} else
 
 		if (template.contains("Dao.xml.vm")) {
-			filename = "main" + File.separator + "resources" + File.separator + "mapper"
-					+ File.separator + moduleName + File.separator + className + "Dao.xml";
+			filename = "main" + File.separator + "resources" + File.separator + "mapper" + File.separator + moduleName
+					+ File.separator + className + "Dao.xml";
 		} else
 
 		if (template.contains("list.html.vm")) {
-			filename = "main" + File.separator + "resources" + File.separator + "views"
-					+ File.separator + "modules" + File.separator + moduleName + File.separator
-					+ className.toLowerCase(Locale.CHINA) + ".html";
+			filename = "main" + File.separator + "resources" + File.separator + "views" + File.separator + "modules"
+					+ File.separator + moduleName + File.separator + className.toLowerCase(Locale.CHINA) + ".html";
 		} else
 
 		if (template.contains("list.js.vm")) {
-			filename = "main" + File.separator + "resources" + File.separator + "static"
-					+ File.separator + "js" + File.separator + "modules" + File.separator
-					+ moduleName + File.separator + className.toLowerCase(Locale.CHINA) + ".js";
+			filename = "main" + File.separator + "resources" + File.separator + "static" + File.separator + "js"
+					+ File.separator + "modules" + File.separator + moduleName + File.separator
+					+ className.toLowerCase(Locale.CHINA) + ".js";
 		} else
 
 		if (template.contains("menu.sql.vm")) {

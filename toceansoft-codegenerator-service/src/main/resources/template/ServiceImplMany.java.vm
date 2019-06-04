@@ -1,0 +1,103 @@
+/*  
+ * Copyright 2010-2019 Tocean Group.  
+ * 版权：商业代码，未经许可，禁止任何形式拷贝、传播及使用
+ * （本公司提供源代码只允许甲方作为系统维护、升级之用，未经我司授权，不得用作开发其他系统） 
+ * 文件名：${className}ServiceImpl.java
+ * 描述：  
+ * 修改人： ${author}
+ * 修改时间：${datetime}
+ * 跟踪单号：  
+ * 修改单号：  
+ * 修改内容：  
+ */
+package ${package}.${moduleName}.service.impl;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import com.toceansoft.common.exception.RRException;
+
+import java.util.List;
+import java.util.Map;
+
+import com.toceansoft.common.vo.DynamicCriteria;
+import ${package}.${moduleName}.dao.${className}Dao;
+import ${package}.${moduleName}.entity.${className}Entity;
+import ${package}.${moduleName}.service.${className}Service;
+
+
+/**
+ * ${comments}
+ * 
+ * @author ${author}
+ */
+@Service("${classname}Service")
+public class ${className}ServiceImpl implements ${className}Service {
+	@Autowired
+	private ${className}Dao ${classname}Dao;
+	
+	@Override
+	public ${className}Entity queryObject(${pk.attrType} ${pk.attrname}) {
+		${className}Entity entity = ${classname}Dao.queryObject(${pk.attrname});
+		if (entity == null) {
+		    // 如果需要在controller层做特殊处理，将下面抛出的异常改为ServiceException即可。
+			throw new RRException("该记录不存在：" + ${pk.attrname});
+		}
+		return entity;
+	}
+	
+	@Override
+	public List<${className}Entity> queryList(Map<String, Object> map) {
+		return ${classname}Dao.queryList(map);
+	}
+	
+	@Override
+	public List<${className}Entity> queryListByCondition(Map<String, Object> map) {
+		return ${classname}Dao.queryListByCondition(map);
+	}
+	
+	@Override
+	public List<${className}Entity> queryListByCondition(DynamicCriteria criteriaExample) {
+		return ${classname}Dao.queryListByCondition(criteriaExample);
+	}
+	
+	@Override
+	public int queryTotal(Map<String, Object> map) {
+		return ${classname}Dao.queryTotal(map);
+	}
+	
+	@Override
+	public int queryTotalByCondition(Map<String, Object> map) {
+		return ${classname}Dao.queryTotalByCondition(map);
+	}
+	
+	@Override
+	public int queryTotalByCondition(DynamicCriteria criteriaExample) {
+		return ${classname}Dao.queryTotalByCondition(criteriaExample);
+	}
+	
+	@Override
+	public void save(${className}Entity ${classname}) {
+		${classname}Dao.save(${classname});
+	}
+	@Override
+	public void saveBatch(List<${className}Entity> item) {
+		${classname}Dao.saveBatch(item);
+	}
+	@Override
+	public void update(${className}Entity ${classname}) {
+		${classname}Dao.update(${classname});
+	}
+	@Override
+	public void updateBatch(List<${className}Entity> item) {
+		${classname}Dao.updateBatch(item);
+	}	
+	@Override
+	public void delete(${pk.attrType} ${pk.attrname}) {
+		${classname}Dao.delete(${pk.attrname});
+	}
+	@Override
+	public void deleteBatch(${pk.attrType}[] ${pk.attrname}s) {
+		${classname}Dao.deleteBatch(${pk.attrname}s);
+	}
+	
+}

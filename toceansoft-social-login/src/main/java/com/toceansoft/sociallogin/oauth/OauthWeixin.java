@@ -25,7 +25,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
 import com.toceansoft.common.exception.RRException;
-import com.toceansoft.common.json.JacksonUtil;
+import com.toceansoft.common.json.JsonUtil;
 import com.toceansoft.sociallogin.vo.OAuth2Token;
 import com.toceansoft.sociallogin.vo.WechatUser;
 
@@ -159,7 +159,7 @@ public class OauthWeixin extends Oauth {
 		boolean isValid = false;
 		log.debug("validJsonStr:" + validJsonStr);
 		if (StringUtils.isNotBlank(validJsonStr)) {
-			Map map = JacksonUtil.json2Bean(validJsonStr, Map.class);
+			Map map = JsonUtil.json2Bean(validJsonStr, Map.class);
 			Integer errcode = (Integer) map.get("errcode");
 			String errmsg = (String) map.get("errmsg");
 			if (errcode == 0 && "ok".equals(errmsg)) {
@@ -187,7 +187,7 @@ public class OauthWeixin extends Oauth {
 		params.put("openid", openId);
 		String userInfo = super.doPost(USER_INFO_URL, params);
 		log.debug("userInfo:" + userInfo);
-		WechatUser user = JacksonUtil.json2BeanSnakeCase(userInfo, WechatUser.class);
+		WechatUser user = JsonUtil.json2BeanSnakeCase(userInfo, WechatUser.class);
 		return user;
 	}
 

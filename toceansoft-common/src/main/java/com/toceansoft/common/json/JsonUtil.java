@@ -1,7 +1,7 @@
 /*  
  * Copyright 2010-2018 Tocean Group.  
  * 版权：商业代码，未经许可，禁止任何形式拷贝、传播及使用
- * 文件名：JacksonUtil.java
+ * 文件名：JsonUtil.java
  * 描述：  
  * 修改人：Arber.Lee  
  * 修改时间：2017年11月22日  
@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
@@ -39,19 +40,16 @@ import net.sf.json.JSONArray;
  * JSON工具类
  * 
  * @author Arber.Lee
- * @version 1.0.0 JacksonUtil
+ * @version 1.0.0 JsonUtil
  * @since 2017年11月22日
  */
-public class JacksonUtil {
+public class JsonUtil {
 	/**
 	 * 
-	 * @param obj
-	 *            Object
-	 * @param mapper
-	 *            ObjectMapper
+	 * @param obj    Object
+	 * @param mapper ObjectMapper
 	 * @return String
-	 * @throws IOException
-	 *             ioe
+	 * @throws IOException ioe
 	 */
 	public static String bean2Json(Object obj, ObjectMapper mapper) throws IOException {
 		StringWriter sw = new StringWriter();
@@ -62,21 +60,14 @@ public class JacksonUtil {
 	}
 
 	/**
-	 * @param <T>
-	 *            T 泛型参数类型
-	 * @param jsonStr
-	 *            String
-	 * @param objClass
-	 *            Class<T>
-	 * @param mapper
-	 *            ObjectMapper
+	 * @param          <T> T 泛型参数类型
+	 * @param jsonStr  String
+	 * @param objClass Class<T>
+	 * @param mapper   ObjectMapper
 	 * @return 返回结果对象
-	 * @throws JsonParseException
-	 *             jpe
-	 * @throws JsonMappingException
-	 *             jme
-	 * @throws IOException
-	 *             ioe
+	 * @throws JsonParseException   jpe
+	 * @throws JsonMappingException jme
+	 * @throws IOException          ioe
 	 */
 	public static <T> T json2Bean(String jsonStr, Class<T> objClass, ObjectMapper mapper)
 			throws JsonParseException, JsonMappingException, IOException {
@@ -84,21 +75,14 @@ public class JacksonUtil {
 	}
 
 	/**
-	 * @param <T>
-	 *            T 泛型参数类型
-	 * @param o
-	 *            Object
-	 * @param objClass
-	 *            Class<T>
-	 * @param mapper
-	 *            ObjectMapper
+	 * @param          <T> T 泛型参数类型
+	 * @param o        Object
+	 * @param objClass Class<T>
+	 * @param mapper   ObjectMapper
 	 * @return 返回结果对象
-	 * @throws JsonParseException
-	 *             jpe
-	 * @throws JsonMappingException
-	 *             jme
-	 * @throws IOException
-	 *             ioe
+	 * @throws JsonParseException   jpe
+	 * @throws JsonMappingException jme
+	 * @throws IOException          ioe
 	 */
 	public static <T> T bean2Bean(Object o, Class<T> objClass, ObjectMapper mapper)
 			throws JsonParseException, JsonMappingException, IOException {
@@ -108,11 +92,9 @@ public class JacksonUtil {
 
 	/**
 	 * 
-	 * @param obj
-	 *            Object
+	 * @param obj Object
 	 * @return String
-	 * @throws IOException
-	 *             ioe
+	 * @throws IOException ioe
 	 */
 	public static String bean2Json(Object obj) throws IOException {
 		ObjectMapper mapper = preparedMapper();
@@ -122,11 +104,9 @@ public class JacksonUtil {
 	/**
 	 * bean 转 json，驼峰变下划线
 	 * 
-	 * @param obj
-	 *            Object
+	 * @param obj Object
 	 * @return String
-	 * @throws IOException
-	 *             ioe
+	 * @throws IOException ioe
 	 */
 	public static String bean2JsonSnakeCase(Object obj) throws IOException {
 		ObjectMapper mapper = preparedMapper();
@@ -136,19 +116,13 @@ public class JacksonUtil {
 	}
 
 	/**
-	 * @param <T>
-	 *            T 泛型参数类型
-	 * @param jsonStr
-	 *            String
-	 * @param objClass
-	 *            Class<T>
+	 * @param          <T> T 泛型参数类型
+	 * @param jsonStr  String
+	 * @param objClass Class<T>
 	 * @return 返回结果对象
-	 * @throws JsonParseException
-	 *             jpe
-	 * @throws JsonMappingException
-	 *             jme
-	 * @throws IOException
-	 *             ioe
+	 * @throws JsonParseException   jpe
+	 * @throws JsonMappingException jme
+	 * @throws IOException          ioe
 	 */
 	public static <T> T json2Bean(String jsonStr, Class<T> objClass)
 			throws JsonParseException, JsonMappingException, IOException {
@@ -157,19 +131,13 @@ public class JacksonUtil {
 	}
 
 	/**
-	 * @param <T>
-	 *            T 泛型参数类型
-	 * @param jsonStr
-	 *            String
-	 * @param objClass
-	 *            Class<T>
+	 * @param          <T> T 泛型参数类型
+	 * @param jsonStr  String
+	 * @param objClass Class<T>
 	 * @return 返回结果对象
-	 * @throws JsonParseException
-	 *             jpe
-	 * @throws JsonMappingException
-	 *             jme
-	 * @throws IOException
-	 *             ioe
+	 * @throws JsonParseException   jpe
+	 * @throws JsonMappingException jme
+	 * @throws IOException          ioe
 	 */
 	public static <T> T json2BeanSnakeCase(String jsonStr, Class<T> objClass)
 			throws JsonParseException, JsonMappingException, IOException {
@@ -179,19 +147,13 @@ public class JacksonUtil {
 	}
 
 	/**
-	 * @param <T>
-	 *            T 泛型参数类型
-	 * @param o
-	 *            Object
-	 * @param objClass
-	 *            Class<T>
+	 * @param          <T> T 泛型参数类型
+	 * @param o        Object
+	 * @param objClass Class<T>
 	 * @return 返回结果对象
-	 * @throws JsonParseException
-	 *             jpe
-	 * @throws JsonMappingException
-	 *             jme
-	 * @throws IOException
-	 *             ioe
+	 * @throws JsonParseException   jpe
+	 * @throws JsonMappingException jme
+	 * @throws IOException          ioe
 	 */
 	public static <T> T bean2Bean(Object o, Class<T> objClass)
 			throws JsonParseException, JsonMappingException, IOException {
@@ -210,10 +172,8 @@ public class JacksonUtil {
 	 * 
 	 * Description:
 	 * 
-	 * @param type
-	 *            Class
-	 * @param std
-	 *            StdSerializer
+	 * @param type Class
+	 * @param std  StdSerializer
 	 * @return ObjectMapper
 	 * 
 	 */
@@ -231,10 +191,8 @@ public class JacksonUtil {
 	 * 
 	 * Description:
 	 * 
-	 * @param type
-	 *            Class
-	 * @param deser
-	 *            JsonDeserializer
+	 * @param type  Class
+	 * @param deser JsonDeserializer
 	 * @return ObjectMapper
 	 * 
 	 */
@@ -251,8 +209,7 @@ public class JacksonUtil {
 	/**
 	 * 暴力解析:Alibaba fastjson
 	 * 
-	 * @param test
-	 *            String
+	 * @param test String
 	 * @return boolean
 	 */
 	public static final boolean isJSONValid(String test) {
@@ -271,8 +228,7 @@ public class JacksonUtil {
 	/**
 	 * Jackson library
 	 * 
-	 * @param jsonInString
-	 *            String
+	 * @param jsonInString String
 	 * @return boolean
 	 */
 	public static final boolean isJSONValid2(String jsonInString) {
@@ -287,11 +243,9 @@ public class JacksonUtil {
 
 	/**
 	 * 
-	 * @param s
-	 *            String
+	 * @param s String
 	 * @return List<String>
-	 * @throws ServiceException
-	 *             se
+	 * @throws ServiceException se
 	 */
 	public static List<String> jsonToList(String s) throws ServiceException {
 		List<String> list = new ArrayList<>();
@@ -305,17 +259,26 @@ public class JacksonUtil {
 		}
 		return list;
 	}
-	
+
 	/**
 	 * 
 	 * @param obj Object
 	 * @return String
 	 */
-    public static String toJson(Object obj) {
-        Gson gson = new GsonBuilder()
-            .setPrettyPrinting()
-            .create();
-        return gson.toJson(obj);
-    }
+	public static String toJson(Object obj) {
+		Gson gson = new GsonBuilder().setPrettyPrinting().create();
+		return gson.toJson(obj);
+	}
 
+	/**
+	 * 
+	 * @param s String
+	 * @return Map<String,Object>
+	 */
+	public static Map<String, Object> jsonToMap(String s) {
+		Map<String, Object> map = null;
+		JSONObject json = JSONObject.parseObject(s);
+		map = (Map<String, Object>) json;
+		return map;
+	}
 }

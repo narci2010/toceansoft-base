@@ -14,6 +14,8 @@ package com.toceansoft.codegenerator.controller;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -30,6 +32,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.toceansoft.codegenerator.entity.ColumnEntityVo;
 import com.toceansoft.codegenerator.service.SysGeneratorService;
 import com.toceansoft.codegenerator.utils.SwitchDB;
@@ -37,6 +40,7 @@ import com.toceansoft.codegenerator.vo.DataSourceVo;
 import com.toceansoft.common.RegexUtils;
 import com.toceansoft.common.exception.RRException;
 import com.toceansoft.common.exception.ServiceException;
+import com.toceansoft.common.json.JsonUtil;
 import com.toceansoft.common.utils.PageUtils;
 import com.toceansoft.common.utils.Query;
 import com.toceansoft.common.utils.R;
@@ -272,6 +276,85 @@ public class SysGeneratorController {
 
 		switchDB.clearCurrentThreadDataSource();
 		return R.ok().put("columns", columns);
+	}
+
+	/**
+	 * 生成多表关联代码
+	 * 
+	 * @param tables     String
+	 * @param columns    String
+	 * @param sysName    String
+	 * @param moduleName String
+	 * @param response   HttpServletResponse
+	 * @throws ServiceException se
+	 */
+	@GetMapping("/codeMany")
+	public void codeMany(String tables, String columns, String sysName, String moduleName, HttpServletResponse response)
+			throws ServiceException {
+		switchDB.setCurrentThreadDataSource();
+		String[] tableNames = new String[] {};
+
+		sysName = sysName.trim().toLowerCase(Locale.CHINA);
+		moduleName = moduleName.trim().toLowerCase(Locale.CHINA);
+		log.debug("tables:" + tables);
+		log.debug("columns:" + columns);
+		log.debug("sysName:" + sysName);
+		log.debug("moduleName:" + moduleName);
+		if (!RegexUtils.isValidJavaIdentifier(sysName)) {
+			throw new RRException("系统名不符合Java命名规则。");
+		}
+
+		if (!RegexUtils.isValidJavaIdentifier(moduleName)) {
+			throw new RRException("模块名不符合Java命名规则。");
+		}
+		try {
+			tables = URLDecoder.decode(tables, "UTF-8");
+			// ['table1','table2','table3']
+			// ['sys_log','sys_oss','sys_config']
+			log.debug("decode:" + tables);
+		} catch (UnsupportedEncodingException e1) {
+			throw new RRException("系统不支持UTF-8编码。", e1);
+		}
+		tableNames = JSON.parseArray(tables).toArray(tableNames);
+		for (String n : tableNames) {
+			log.debug("t:" + n);
+		}
+
+		try {
+			columns = URLDecoder.decode(columns, "UTF-8");
+			// {'table1': ['a','b','c'],'table2': ['a1','b2','c3'],'table3':
+			// ['a3','b3','c3']}
+
+			// {'sys_log': ['id','username','create_date'],'sys_oss':
+			// ['id','url','create_date'],'sys_config': ['id','key','value']}
+			log.debug("decode columns:" + columns);
+		} catch (UnsupportedEncodingException e1) {
+			throw new RRException("系统不支持UTF-8编码。", e1);
+		}
+		Map<String, List<String>> tableOfColumns = new HashMap<String, List<String>>();
+		Map<String, Object> tmpMap = JsonUtil.jsonToMap(columns);
+		for (Map.Entry<String, Object> entry : tmpMap.entrySet()) {
+			JSONArray colValues = (JSONArray) entry.getValue();
+			String[] colValuesStr = new String[] {};
+			colValuesStr = colValues.toArray(colValuesStr);
+			tableOfColumns.put(entry.getKey(), Arrays.asList(colValuesStr));
+			log.debug(entry.getKey() + ":" + Arrays.toString(colValuesStr));
+		}
+
+		byte[] data = sysGeneratorService.generatorCodeMany(tableNames, tableOfColumns, sysName, moduleName);
+
+		response.reset();
+		response.setHeader("Content-Disposition", "attachment; filename=\"" + sysName + moduleName + ".zip\"");
+		response.addHeader("Content-Length", "" + data.length);
+		response.setContentType("application/octet-stream; charset=UTF-8");
+
+		try {
+			IOUtils.write(data, response.getOutputStream());
+		} catch (IOException e) {
+			switchDB.clearCurrentThreadDataSource();
+			throw new ServiceException("代码自动生成失败，请查看后台日志。", e);
+		}
+		switchDB.clearCurrentThreadDataSource();
 	}
 
 }

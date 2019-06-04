@@ -36,7 +36,7 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.toceansoft.common.HttpsUtil;
 import com.toceansoft.common.exception.CouchDBException;
-import com.toceansoft.common.json.JacksonUtil;
+import com.toceansoft.common.json.JsonUtil;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -754,7 +754,7 @@ public final class CouchDBUtil {
 		// log.debug("content:" + content);
 		String rev = null;
 		try {
-			Map<String, String> map = JacksonUtil.json2Bean(content, Map.class);
+			Map<String, String> map = JsonUtil.json2Bean(content, Map.class);
 			rev = map.get("_rev");
 			log.debug("rev:" + rev);
 		} catch (JsonParseException e) {
@@ -846,7 +846,7 @@ public final class CouchDBUtil {
 		}
 		Map<String, List> map;
 		try {
-			map = JacksonUtil.json2Bean(content, Map.class);
+			map = JsonUtil.json2Bean(content, Map.class);
 		} catch (JsonParseException e) {
 			throw new CouchDBException(e.getMessage(), e);
 		} catch (JsonMappingException e) {
@@ -858,7 +858,7 @@ public final class CouchDBUtil {
 		 List<CouchDBParams> dbUsers = new ArrayList<CouchDBParams>();
 		 for (Map doc:docs) {
 			 try {
-				 dbUsers.add(JacksonUtil.bean2Bean(doc, CouchDBParams.class));
+				 dbUsers.add(JsonUtil.bean2Bean(doc, CouchDBParams.class));
 			} catch (JsonParseException e) {
 				throw new CouchDBException(e.getMessage(), e);
 			} catch (JsonMappingException e) {
@@ -904,7 +904,7 @@ public final class CouchDBUtil {
 		// log.debug("content:" + content);
 		boolean isExists = true;
 		try {
-			Map<String, String> map = JacksonUtil.json2Bean(content, Map.class);
+			Map<String, String> map = JsonUtil.json2Bean(content, Map.class);
 			String error = map.get("error");
 			if (error != null && "not_found".equals(error)) {
 				isExists = false;

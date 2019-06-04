@@ -22,7 +22,7 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.toceansoft.common.CommonUtils;
 import com.toceansoft.common.exception.RRException;
 import com.toceansoft.common.exception.ServiceException;
-import com.toceansoft.common.json.JacksonUtil;
+import com.toceansoft.common.json.JsonUtil;
 import com.toceansoft.common.validator.Assert;
 import com.toceansoft.common.vo.Criteria;
 import com.toceansoft.common.vo.CriteriaVo;
@@ -55,12 +55,12 @@ public final class DynamicCriteriaUtils {
 		if (StringUtils.isEmpty(queryVoExt.getSearch())) {
 			queryVoExt.setSearch("{}");
 		}
-		if (!JacksonUtil.isJSONValid2(queryVoExt.getSearch())) {
+		if (!JsonUtil.isJSONValid2(queryVoExt.getSearch())) {
 			throw new RRException("查询条件为非法Json格式。");
 		}
 		CriteriaVo criteriaVo = null;
 		try {
-			criteriaVo = JacksonUtil.json2Bean(queryVoExt.getSearch(), CriteriaVo.class);
+			criteriaVo = JsonUtil.json2Bean(queryVoExt.getSearch(), CriteriaVo.class);
 			log.debug("criteriaVo:" + criteriaVo);
 		} catch (JsonParseException e) {
 			// ExceptionUtils.printRootCauseStackTrace(e);
@@ -193,7 +193,7 @@ public final class DynamicCriteriaUtils {
 				break;
 			case "in":
 				try {
-					List<String> values = JacksonUtil.jsonToList(criterionVo.getValue());
+					List<String> values = JsonUtil.jsonToList(criterionVo.getValue());
 					Assert.isEmtpy(values, "比较条件值不能为空。");
 					criteria.in(criterionVo.getField(), values);
 				} catch (ServiceException e) {
@@ -204,7 +204,7 @@ public final class DynamicCriteriaUtils {
 				break;
 			case "not in":
 				try {
-					List<String> values = JacksonUtil.jsonToList(criterionVo.getValue());
+					List<String> values = JsonUtil.jsonToList(criterionVo.getValue());
 					Assert.isEmtpy(values, "比较条件值不能为空。");
 					criteria.in(criterionVo.getField(), values);
 				} catch (ServiceException e) {
